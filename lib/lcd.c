@@ -2,10 +2,51 @@
  * lcd.c - LCD Selection Library
  **/
 
+#pragma systemFile
 
 void lcdClear() {
     clearLCDLine(0);
     clearLCDLine(1);
+}
+
+
+int lcdDebugSlot = 0;
+
+task lcdDebug() {
+    while(true) {
+        if (nLCDButtons == kButtonLeft && lcdDebugSlot > 0) lcdDebugSlot--;
+        if (nLCDButtons == kButtonRight) lcdDebugSlot++;
+
+        lcdClear();
+        string lineOne;
+        string lineTwo;
+
+        switch(lcdDebugSlot) {
+            // Specialized displays for specific situations, not useful in general debug mode
+
+
+            // Normal access displays
+            case 0:
+                sprintf(lineOne, "%1.2fV", nImmediateBatteryLevel/1000.0);
+                sprintf(lineTwo, "%1.2fV", BackupBatteryLevel/1000.0);
+                break;
+            case 1:
+                sprintf(lineOne, "%f", SensorValue[in1] / 10);
+                sprintf(lineTwo, "");
+                break;
+            case 2:
+                sprintf(lineOne, "%d,%d", robot.leftDrive, robot.rightDrive);
+                sprintf(lineTwo, "");
+                break;
+            default:
+                sprintf(lineOne, "Slot %d", lcdDebugSlot);
+
+        }
+
+        displayLCDString(0, 0, lineOne);
+        displayLCDString(1, 0, lineTwo);
+        wait1Msec(140);
+}
 }
 
 /**
@@ -88,4 +129,3 @@ void lcdStartup() {
 
     lcdClear();
 }
-

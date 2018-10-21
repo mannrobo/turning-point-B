@@ -20,6 +20,12 @@
 //Main competition background code...do not modify!
 #include "Vex_Competition_Includes.c"
 
+#include "lib\util.c"
+#include "hal.c"
+
+#include "lib\lcd.c"
+#include "lib\motor.c"
+
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
 /*                                                                           */
@@ -35,6 +41,17 @@ void pre_auton() {
   // running between Autonomous and Driver controlled modes. You will need to
   // manage all user created tasks if set to false.
   bStopTasksBetweenModes = true;
+
+  //Completely clear out any previous sensor readings by setting the port to "sensorNone"
+  SensorType[in1] = sensorNone;
+  lcdStartup();
+  //Reconfigure Analog Port 8 as a Gyro sensor and allow time for ROBOTC to calibrate it
+  SensorType[in1] = sensorGyro;
+  wait1Msec(2000);
+
+
+  startTask(lcdDebug);
+  startTask(handleAll);
 
 	// Set bDisplayCompetitionStatusOnLcd to false if you don't want the LCD
 	// used by the competition include file, for example, you might want
@@ -87,7 +104,16 @@ task usercontrol() {
     // update your motors, etc.
     // ........................................................................
 
+
+    if(lcdDebugSlot == 3) {
+      motor[DriveBackLeft] = 80;
+      motor[DriveBackRight] = 80;
+      motor[DriveFrontLeft] = 80;
+      motor[DriveFrontRight] = 80;
+    }
+
     // Remove this function call once you have "real" code.
-    UserControlCodePlaceholderForTesting();
+    // UserControlCodePlaceholderForTesting();
+    wait1Msec(20);
   }
 }
