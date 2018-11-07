@@ -123,7 +123,7 @@ void lcdStartup() {
 	bLCDBacklight = true;
     lcdClear();
 
-    displayLCDCenteredString(0, "Fly by Wire");
+    displayLCDCenteredString(0, "Secure the Flag");
     displayLCDCenteredString(1, "3796B");
     wait1Msec(1000);
 
