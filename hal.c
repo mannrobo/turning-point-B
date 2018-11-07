@@ -13,11 +13,7 @@ robotState robot;
 
 /** Section 1: Drive **/
 void driveHandle() {
-    motorTarget[DriveFrontLeft] = robot.leftDrive;
-    motorTarget[DriveBackLeft] = robot.leftDrive;
 
-    motorTarget[DriveFrontRight] = robot.rightDrive;
-    motorTarget[DriveBackRight] = robot.rightDrive;
 }
 
 /** Section 2: Controller **/
