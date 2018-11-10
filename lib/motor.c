@@ -69,11 +69,11 @@ void motorControlStep() {
         motorSlewLastSet[i] = outs[i];
 
         // 4. TrueSpeed - Standardizes the acceleration curve of the Motor Controller
-        if(i == 0 || i == 9) {
-            outs[i] = sgn(outs[i]) * L298[abs(outs[i])];
-        } else {
-            outs[i] = sgn(outs[i]) * MC29[abs(outs[i])];
-        }
+        // if(i == 0 || i == 9) {
+        //     outs[i] = sgn(outs[i]) * L298[abs(outs[i])];
+        // } else {
+        //     outs[i] = sgn(outs[i]) * MC29[abs(outs[i])];
+        // }
 
         // 5. Set Motor
         motor[i] = outs[i];
