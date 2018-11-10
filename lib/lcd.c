@@ -31,12 +31,12 @@ task lcdDebug() {
                 sprintf(lineTwo, "%1.2fV", BackupBatteryLevel/1000.0);
                 break;
             case 1:
-                sprintf(lineOne, "%f", SensorValue[in1] / 10);
+                sprintf(lineOne, "%f", robot.flywheel.controller.value);
                 sprintf(lineTwo, "");
                 break;
             case 2:
                 sprintf(lineOne, "%d,%d", robot.leftDrive, robot.rightDrive);
-                sprintf(lineTwo, "");
+                sprintf(lineTwo, "%d,%d,%d,%d", motor[DriveFL], motor[DriveFR], motor[DriveBL], motor[DriveBR]);
                 break;
             default:
                 sprintf(lineOne, "Slot %d", lcdDebugSlot);
