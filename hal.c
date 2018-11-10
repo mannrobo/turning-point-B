@@ -35,8 +35,8 @@ HardwareAbstraction robot;
  */
 void controllerStep() {
     // Drive, with secret sauce!
-    int forward = abs(vexRT[Ch3]) > 60 ? vexRT[Ch3] : 0,
-        turn = abs(vexRT[Ch4]) > 90 ? vexRT[Ch4] * 0.9 : 0,
+    int forward = abs(vexRT[Ch3]) > 40 ? vexRT[Ch3] : 0,
+        turn = abs(vexRT[Ch4]) > 40 ? vexRT[Ch4] * 0.7 : 0,
         left = forward + turn,
         right = forward - turn;
 
@@ -97,7 +97,7 @@ task hardwareAbstractionLayer() {
 
     while(true) {
         if(!bIfiAutonomousMode) {
-            controllerStep();
+            // controllerStep();
         }
         driveStep();
         flywheelStep();
