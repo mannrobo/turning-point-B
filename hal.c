@@ -96,7 +96,9 @@ task hardwareAbstractionLayer() {
     robot.flywheel.gearRatio = 5.0;
 
     while(true) {
-        controllerStep();
+        if(!bIfiAutonomousMode) {
+            controllerStep();
+        }
         driveStep();
         flywheelStep();
 
