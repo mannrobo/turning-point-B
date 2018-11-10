@@ -92,12 +92,12 @@ void flywheelStep() {
 
 task hardwareAbstractionLayer() {
     configurePID(robot.flywheel.controller, 14, 0, 50);
-    robot.flywheel.encoderPort = FlywheelRot;
+    robot.flywheel.encoderPort = flywheelRot;
     robot.flywheel.gearRatio = 5.0;
 
     while(true) {
         if(!bIfiAutonomousMode) {
-            // controllerStep();
+           controllerStep();
         }
         driveStep();
         flywheelStep();
