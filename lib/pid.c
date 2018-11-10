@@ -12,6 +12,7 @@ typedef struct {
 
     float target; // Target Value
     float value;  // Measured Value
+    float error;
 
     float output; // Output of calculation
 
@@ -21,18 +22,18 @@ typedef struct {
 } PIDController;
 
 void stepPID(PIDController & config) {
-    float error = config.target - config.value;
+    config.error = config.target - config.value;
 
     if(config.Ki != 0) {
-        config.accumulatedError += error;
+        config.accumulatedError += config.error;
     }
 
     config.output =
-        (config.Kp * error) +
+        (config.Kp * config.error) +
         (config.Ki * config.accumulatedError) +
         (config.Kd * config.lastError);
 
-    config.lastError = error;
+    config.lastError = config.error;
 }
 
 void setPID(PIDController & config, float value) {
@@ -48,6 +49,11 @@ void configurePID(PIDController & config, float Kp, float Ki, float Kd) {
 void targetPID(PIDController & config, float target) {
     config.target = target;
 }
+
+
+
+
+
 
 /**
  * Specifics for a VELOCITY PID
@@ -80,7 +86,7 @@ void readEncoderVPID(VelocityPID & config) {
     config.lastEncoder = SensorValue[config.encoderPort];
 
     // Set controller in ticks per second
-    config.controller.value = config.deltaEncoder / config.deltaTime;
+    config.controller.value = (config.deltaEncoder / config.deltaTime) * config.gearRatio;
 }
 
 void stepVPID(VelocityPID & config) {
@@ -93,12 +99,20 @@ void stepVPID(VelocityPID & config) {
  */
 void targetVPID(VelocityPID & config, int target) {
     // Convert target to ticks per second
-    config.controller.target = ((target / 60) * 360) / config.gearRatio;
+    config.controller.target = target / 60.0 / 1000.0 * 360.0;
 }
 
 /**
  * Returns the current speed of controller in RPM
  */
-int measureVPID(VelocityPID & config) {
-    return (int)(config.gearRatio * (config.controller.value * 60) / 360.0);
+float measureVPID(VelocityPID & config) {
+    return (config.controller.value * 1000.0) / 360.0 * 60;
+}
+
+/**
+ * Tuning Utilies
+ */
+
+void graphVPID(VelocityPID & config, int series) {
+    datalogAddValue(series, measureVPID(config));
 }
