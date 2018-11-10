@@ -6,9 +6,9 @@
 
 // Stores motor targets, use this instead of motor[]
 int motorTarget[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-int motorSlew[10] =   { 5, 5, 5, 5, 5, 5, 5, 5, 5, 5 }; 
+int motorSlew[10] =   { 10, 15, 20, 20, 10, 10, 20, 20, 15, 10 }; 
 int motorSlewLastSet[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-int motorDeadband[10] = { 40, 40, 15, 15, 15, 15, 15, 15, 15, 15 };
+int motorDeadband[10] = { 15, 15, 15, 15, 15, 15, 15, 15, 15, 15 };
 
 // Thanks to Jess from 21S (@Unionjackz) for truespeed tables
 static const char L298[128] = {
@@ -43,7 +43,7 @@ static const char MC29[128] = {
     62, 64, 67, 70, 72, 76, 79, 83, 84, 127,
 };
 
-void motorHandle() {
+void motorControlStep() {
     int outs[10]; // Stores intermediate output values
     int motorCurrent; // Temp variable used for slew rate
     // Loop through each motor slot
@@ -70,12 +70,10 @@ void motorHandle() {
 
         // 4. TrueSpeed - Standardizes the acceleration curve of the Motor Controller
         if(i == 0 || i == 9) {
-            // outs[i] = sgn(outs[i]) * L298[abs(outs[i])];
+            outs[i] = sgn(outs[i]) * L298[abs(outs[i])];
         } else {
-            // outs[i] = sgn(outs[i]) * MC29[abs(outs[i])];
+            outs[i] = sgn(outs[i]) * MC29[abs(outs[i])];
         }
-
-        // writeDebugStreamLine("port%d: %d", i, outs[i]);
 
         // 5. Set Motor
         motor[i] = outs[i];
