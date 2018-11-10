@@ -2,9 +2,9 @@
 #pragma config(UART_Usage, UART2, uartNotUsed, baudRate4800, IOPins, None, None)
 #pragma config(Sensor, in1,    gyro,           sensorGyro)
 #pragma config(Sensor, in2,    powerExpander,  sensorAnalog)
-#pragma config(Sensor, dgtl1,  FlywheelRot,    sensorQuadEncoder)
-#pragma config(Sensor, dgtl6,  LeftDrive,      sensorQuadEncoder)
-#pragma config(Sensor, dgtl8,  RightDrive,     sensorQuadEncoder)
+#pragma config(Sensor, dgtl1,  flywheelRot,    sensorQuadEncoder)
+#pragma config(Sensor, dgtl6,  leftDrive,      sensorQuadEncoder)
+#pragma config(Sensor, dgtl8,  rightDrive,     sensorQuadEncoder)
 #pragma config(Motor,  port1,           Uptake,        tmotorVex393_HBridge, openLoop, reversed)
 #pragma config(Motor,  port2,           FlywheelA,     tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port3,           DriveFL,       tmotorVex393TurboSpeed_MC29, openLoop)
@@ -62,11 +62,11 @@ void pre_auton() {
   wait1Msec(2000);
 
   // Clear flywheel Quad Encoder
-  SensorValue[FlywheelRot] = 0;
+  SensorValue[flywheelRot] = 0;
 
   // Clear Drive Encoders
-  SensorValue[LeftDrive] = 0;
-  SensorValue[RightDrive] = 0;
+  SensorValue[leftDrive] = 0;
+  SensorValue[rightDrive] = 0;
 
 
   startTask(lcdDebug);
@@ -112,11 +112,8 @@ task autonomous() {
 
 task usercontrol() {
 
-  // Go forward 600 ticks
-  drive(2000);
-
-
   while (true) {
+
     wait1Msec(20);
   }
 
