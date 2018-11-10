@@ -1,12 +1,15 @@
 #pragma config(UART_Usage, UART1, uartVEXLCD, baudRate19200, IOPins, None, None)
 #pragma config(UART_Usage, UART2, uartNotUsed, baudRate4800, IOPins, None, None)
-#pragma config(Sensor, in1,    gyro,           sensorNone)
-#pragma config(Sensor, dgtl1,  flywheelQuad,   sensorQuadEncoder)
+#pragma config(Sensor, in1,    gyro,           sensorGyro)
+#pragma config(Sensor, in2,    powerExpander,  sensorAnalog)
+#pragma config(Sensor, dgtl1,  FlywheelRot,    sensorQuadEncoder)
+#pragma config(Sensor, dgtl6,  LeftDrive,      sensorQuadEncoder)
+#pragma config(Sensor, dgtl8,  RightDrive,     sensorQuadEncoder)
 #pragma config(Motor,  port1,           Uptake,        tmotorVex393_HBridge, openLoop, reversed)
 #pragma config(Motor,  port2,           FlywheelA,     tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port3,           DriveFL,       tmotorVex393TurboSpeed_MC29, openLoop)
 #pragma config(Motor,  port4,           DriveFR,       tmotorVex393TurboSpeed_MC29, openLoop)
-#pragma config(Motor,  port6,           Intake,        tmotorVex393_MC29, openLoop)
+#pragma config(Motor,  port6,           Intake,        tmotorVex393_MC29, openLoop, reversed)
 #pragma config(Motor,  port7,           DriveBL,       tmotorVex393TurboSpeed_MC29, openLoop)
 #pragma config(Motor,  port8,           DriveBR,       tmotorVex393TurboSpeed_MC29, openLoop)
 #pragma config(Motor,  port9,           FlywheelB,     tmotorVex393_MC29, openLoop)
@@ -34,6 +37,7 @@
 #include "lib\lcd.c"
 #include "lib\motor.c"
 #include "lib\pid.c"
+#include "lib\auton.c"
 
 /*---------------------------------------------------------------------------*/
 /*                          Pre-Autonomous Functions                         */
@@ -49,14 +53,20 @@ void pre_auton() {
   // Set bStopTasksBetweenModes to false if you want to keep user created tasks
   // running between Autonomous and Driver controlled modes. You will need to
   // manage all user created tasks if set to false.
-  bStopTasksBetweenModes = true;
+  bStopTasksBetweenModes = false;
+  bDisplayCompetitionStatusOnLcd = false;
 
-  //Completely clear out any previous sensor readings by setting the port to "sensorNone"
-  SensorType[in1] = sensorNone;
+  SensorType[gyro] = sensorNone;
   lcdStartup();
-  //Reconfigure Analog Port 8 as a Gyro sensor and allow time for ROBOTC to calibrate it
-  SensorType[in1] = sensorGyro;
+  SensorType[gyro] = sensorGyro;
   wait1Msec(2000);
+
+  // Clear flywheel Quad Encoder
+  SensorValue[FlywheelRot] = 0;
+
+  // Clear Drive Encoders
+  SensorValue[LeftDrive] = 0;
+  SensorValue[RightDrive] = 0;
 
 
   startTask(lcdDebug);
@@ -101,10 +111,13 @@ task autonomous() {
 /*---------------------------------------------------------------------------*/
 
 task usercontrol() {
-  // User control code here, inside the loop
+
+  // Go forward 600 ticks
+  drive(2000);
+
 
   while (true) {
-
     wait1Msec(20);
   }
+
 }
