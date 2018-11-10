@@ -26,20 +26,25 @@ task lcdDebug() {
 
 
             // Normal access displays
-            case 0:
+            case 3:
                 sprintf(lineOne, "%1.2fV", nImmediateBatteryLevel/1000.0);
                 sprintf(lineTwo, "%1.2fV", BackupBatteryLevel/1000.0);
                 break;
             case 1:
-                sprintf(lineOne, "%f", robot.flywheel.controller.value);
-                sprintf(lineTwo, "");
+                sprintf(lineOne, "%d,%d", motor[FlywheelA], motor[FlywheelB]);
+                sprintf(lineTwo, "%f,%f", robot.flywheel.controller.error);
                 break;
             case 2:
                 sprintf(lineOne, "%d,%d", robot.leftDrive, robot.rightDrive);
                 sprintf(lineTwo, "%d,%d,%d,%d", motor[DriveFL], motor[DriveFR], motor[DriveBL], motor[DriveBR]);
                 break;
+            case 0:
+                sprintf(lineOne, "%d,%d", robot.leftDrive, robot.rightDrive);
+                sprintf(lineTwo, "%d,%d,%f", SensorValue[LeftDrive], SensorValue[RightDrive], SensorValue[gyro]);
+                break;
             default:
-                sprintf(lineOne, "Slot %d", lcdDebugSlot);
+                sprintf(lineOne, "LCD DEBUG SYSTEM");
+                sprintf(lineTwo, "Slot %d", lcdDebugSlot);
 
         }
 
