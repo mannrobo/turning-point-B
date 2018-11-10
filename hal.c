@@ -5,11 +5,12 @@
 #include "lib\motor.c"
 #include "lib\pid.c"
 
-typedef enum {
+enum motorMode {
     STOP = 0,
-    IN = 1,
-    OUT = 2,
-} intakeMode;
+    FORWARD = 1,
+    REVERSE = 2,
+};
+
 
 typedef struct {
 
@@ -19,9 +20,10 @@ typedef struct {
 
     // Flywheel
     VelocityPID flywheel;
+    bool runFlywheel;
 
-    // Intake
-    intakeMode intake;
+    motorMode intake;
+    motorMode uptake;
 
 } HardwareAbstraction;
 
@@ -32,7 +34,7 @@ HardwareAbstraction robot;
  * Individual subsystem control
  */
 void controllerStep() {
-    // Step 1: Drive
+    // Drive, with secret sauce!
     int forward = abs(vexRT[Ch3]) > 60 ? vexRT[Ch3] : 0,
         turn = abs(vexRT[Ch4]) > 90 ? vexRT[Ch4] * 0.9 : 0,
         left = forward + turn,
@@ -41,32 +43,56 @@ void controllerStep() {
     robot.leftDrive = sgn(left) * rescaleTo(127, abs(left), abs(right), 0);
     robot.rightDrive = sgn(right) * rescaleTo(127, abs(left), abs(right), 1);
 
-    // Step 2: Intake
-    if(vexRT[Btn5U]) {
-        robot.intake = IN;
+    // Intake
+    if((vexRT[Btn5U] && robot.intake == FORWARD) || (vexRT[Btn5D] && robot.intake == REVERSE)) {
+        robot.intake = STOP;
+    } else if(vexRT[Btn5U]) {
+        robot.intake = FORWARD;
     } else if (vexRT[Btn5D]) {
-        robot.intake = OUT;
+        robot.intake = REVERSE;
     }
+
+    // Uptake
+    if((vexRT[Btn6U] && robot.uptake == FORWARD) || (vexRT[Btn6D] && robot.uptake == REVERSE)) {
+        robot.uptake = STOP;
+    } else if(vexRT[Btn6U]) {
+        robot.uptake = REVERSE;
+    } else if (vexRT[Btn6D]) {
+        robot.uptake = FORWARD;
+    }
+
+    // Flywheel (temporary)
+    if(vexRT[Btn7U]) {
+        robot.runFlywheel = true;
+    } else if(vexRT[Btn7D]) {
+        robot.runFlywheel = false;
+    }
+
 }
 
 void driveStep() {
-    motorTarget[DriveFL] = -robot.leftDrive;
-    motorTarget[DriveBL] = -robot.leftDrive;
+    motorTarget[DriveFL] = robot.leftDrive;
+    motorTarget[DriveBL] = robot.leftDrive;
 
-    motorTarget[DriveFR] = robot.rightDrive;
-    motorTarget[DriveBR] = robot.rightDrive;
+    motorTarget[DriveFR] = -robot.rightDrive;
+    motorTarget[DriveBR] = -robot.rightDrive;
 }
 
 void flywheelStep() {
-    stepVPID(robot.flywheel);
+    // stepVPID(robot.flywheel);
 
-    // motorTarget[FlywheelA] = robot.flywheel.controller.output;
-    // motorTarget[FlywheelB] = robot.flywheel.controller.output;
+    if(robot.runFlywheel) {
+        motorTarget[FlywheelA] = 127;
+        motorTarget[FlywheelB] = 127;
+    } else {
+        motorTarget[FlywheelA] = 0;
+        motorTarget[FlywheelB] = 0;
+    }
 }
 
 task hardwareAbstractionLayer() {
-    configurePID(robot.flywheel.controller, 0, 0, 0);
-    robot.flywheel.encoderPort = flywheelQuad;
+    configurePID(robot.flywheel.controller, 14, 0, 50);
+    robot.flywheel.encoderPort = FlywheelRot;
     robot.flywheel.gearRatio = 5.0;
 
     while(true) {
@@ -76,14 +102,26 @@ task hardwareAbstractionLayer() {
 
         // Misc.
         switch(robot.intake) {
-            case IN:
-                motorTarget[Intake] = -127;
-                break;
-            case OUT:
+            case FORWARD:
                 motorTarget[Intake] = 127;
+                break;
+            case REVERSE:
+                motorTarget[Intake] = -127;
                 break;
             case STOP:
                 motorTarget[Intake] = 0;
+                break;
+        }
+
+        switch(robot.uptake) {
+            case FORWARD:
+                motorTarget[Uptake] = 127;
+                break;
+            case REVERSE:
+                motorTarget[Uptake] = -127;
+                break;
+            case STOP:
+                motorTarget[Uptake] = 0;
                 break;
         }
 
