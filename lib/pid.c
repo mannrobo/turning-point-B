@@ -58,8 +58,7 @@ void targetPID(PIDController & config, float target) {
 /**
  * Specifics for a VELOCITY PID
  *
- * Note: this velocity pid works in ticks per second (not rpm)
- * User-facing functions will likely want to translate this to rpm
+ * (rpm version)
  */
 typedef struct {
 
@@ -85,35 +84,10 @@ void readEncoderVPID(VelocityPID & config) {
     config.deltaEncoder = SensorValue[config.encoderPort] - config.lastEncoder;
     config.lastEncoder = SensorValue[config.encoderPort];
 
-    // Set controller in ticks per second
-    config.controller.value = (config.deltaEncoder / config.deltaTime) * config.gearRatio;
+    config.controller.value = ((float)config.deltaEncoder / (float)config.deltaTime) * 1000.0 *  config.gearRatio / 360.0 * 60.0;
 }
 
 void stepVPID(VelocityPID & config) {
     readEncoderVPID(config);
     stepPID(config.controller);
-}
-
-/**
- * Set a target for a velocity pid IN RPM, accounting for the gear ratio
- */
-void targetVPID(VelocityPID & config, int target) {
-    // Convert target to ticks per second
-    config.controller.target = target / 60.0 / 1000.0 * 360.0;
-}
-
-/**
- * Returns the current speed of controller in RPM
- */
-float measureVPID(VelocityPID & config) {
-    return (config.controller.value * 1000.0) / 360.0 * 60.0;
-}
-
-
-/**
- * Tuning Utilies
- */
-
-void graphVPID(VelocityPID & config, int series) {
-    datalogAddValue(series, measureVPID(config));
 }
