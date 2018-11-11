@@ -106,8 +106,9 @@ void targetVPID(VelocityPID & config, int target) {
  * Returns the current speed of controller in RPM
  */
 float measureVPID(VelocityPID & config) {
-    return (config.controller.value * 1000.0) / 360.0 * 60;
+    return (config.controller.value * 1000.0) / 360.0 * 60.0;
 }
+
 
 /**
  * Tuning Utilies
