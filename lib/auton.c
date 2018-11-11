@@ -6,14 +6,12 @@
 #include "pid.c"
 
 
-PIDController driveController;
-
 
 // Drives a specific distance (forward, use negative for backwards) in ticks
 void drive(int distance) {
 
-    configurePID(driveController, 0.5, 0, 0);
-    targetPID(driveController, distance);
+    configurePID(robot.driveController, 0.5, 0, 0);
+    targetPID(robot.driveController, distance);
 
     SensorValue[leftDrive] = 0;
     SensorValue[rightDrive] = 0;
@@ -23,12 +21,12 @@ void drive(int distance) {
 
 
     while(SensorValue[leftDrive] < distance) {
-        stepPID(driveController);
+        stepPID(robot.driveController);
 
-        driveController.value = SensorValue[leftDrive];
+        robot.driveController.value = SensorValue[leftDrive];
 
-        robot.leftDrive = driveController.output;
-        robot.rightDrive = driveController.output;
+        robot.leftDrive = robot.driveController.output;
+        robot.rightDrive = robot.driveController.output;
 
         wait1Msec(20);
     }
@@ -39,20 +37,18 @@ void drive(int distance) {
 }
 
 
-PIDController turnController;
-
 // Turns using gyro
 void turn(float degrees) {
-    configurePID(turnController, 0.85, 0, 0);
-    targetPID(turnController, degrees);
+    configurePID(robot.turnController, 0.85, 0, 0);
+    targetPID(robot.turnController, degrees);
 
     do {
-        turnController.value = SensorValue[gyro] / 10;
-        stepPID(turnController);
+        robot.turnController.value = SensorValue[gyro] / 10;
+        stepPID(robot.turnController);
 
         // Clamp turns even if the error is greater
-        robot.leftDrive = -clamp(abs(turnController.output), 0, 70) * sgn(turnController.output);
-        robot.rightDrive = clamp(abs(turnController.output), 0, 70) * sgn(turnController.output);
+        robot.leftDrive = -clamp(abs(robot.turnController.output), 0, 70) * sgn(robot.turnController.output);
+        robot.rightDrive = clamp(abs(robot.turnController.output), 0, 70) * sgn(robot.turnController.output);
 
-    } while(abs(turnController.error) > 5)
+    } while(abs(robot.turnController.error) > 5)
 }
