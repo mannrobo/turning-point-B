@@ -6,7 +6,7 @@
 
 // Stores motor targets, use this instead of motor[]
 int motorTarget[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-int motorSlew[10] =   { 10, 15, 20, 20, 10, 10, 20, 20, 15, 10 }; 
+int motorSlew[10] =   { 10, 10, 20, 20, 10, 10, 20, 20, 10, 10 }; 
 int motorSlewLastSet[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 int motorDeadband[10] = { 15, 15, 15, 15, 15, 15, 15, 15, 15, 15 };
 
