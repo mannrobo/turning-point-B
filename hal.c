@@ -4,6 +4,7 @@
 
 #include "lib\motor.c"
 #include "lib\pid.c"
+#include "lib\tbh.c"
 
 enum motorMode {
     STOP = 0,
@@ -18,9 +19,12 @@ typedef struct {
     int leftDrive;
     int rightDrive;
 
+    // Drive PIDs (actually just p-loops but whatever)
+    PIDController driveController;
+    PIDController turnController;
+
     // Flywheel
-    VelocityPID flywheel;
-    bool runFlywheel;
+    TBHController flywheel;
 
     motorMode intake;
     motorMode uptake;
@@ -63,9 +67,11 @@ void controllerStep() {
 
     // Flywheel (temporary)
     if(vexRT[Btn7U]) {
-        robot.runFlywheel = true;
+        targetTBH(robot.flywheel, 2500);
+    } else if(vexRT[Btn7R]) {
+        targetTBH(robot.flywheel, 1800);
     } else if(vexRT[Btn7D]) {
-        robot.runFlywheel = false;
+        targetTBH(robot.flywheel, 0);
     }
 
 }
@@ -79,21 +85,15 @@ void driveStep() {
 }
 
 void flywheelStep() {
-    // stepVPID(robot.flywheel);
+    calculateProcessTBH(robot.flywheel);
+    stepTBH(robot.flywheel);
 
-    if(robot.runFlywheel) {
-        motorTarget[FlywheelA] = 127;
-        motorTarget[FlywheelB] = 127;
-    } else {
-        motorTarget[FlywheelA] = 0;
-        motorTarget[FlywheelB] = 0;
-    }
+    motorTarget[FlywheelA] = robot.flywheel.output;
+    motorTarget[FlywheelB] = robot.flywheel.output;
 }
 
 task hardwareAbstractionLayer() {
-    configurePID(robot.flywheel.controller, 14, 0, 50);
-    robot.flywheel.encoderPort = flywheelRot;
-    robot.flywheel.gearRatio = 5.0;
+    initTBH(robot.flywheel, 0.0015, 2500, flywheelRot, 5.0);
 
     while(true) {
         if(!bIfiAutonomousMode) {
