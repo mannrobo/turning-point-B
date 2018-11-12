@@ -112,9 +112,6 @@ task autonomous() {
 /*---------------------------------------------------------------------------*/
 
 task usercontrol() {
-
-  targetTBH(robot.flywheel, 1400);
-
   while (true) {
 
     wait1Msec(20);
