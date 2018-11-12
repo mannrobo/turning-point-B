@@ -29,7 +29,7 @@ task lcdDebug() {
             // Normal access displays
             case 1:
                 sprintf(lineOne, "M: %1.2fV", nImmediateBatteryLevel/1000.0);
-                sprintf(lineTwo, "E: %1.2fV B: %1.2fV", SensorValue[powerExpander]/270.0, BackupBatteryLevel/1000.0);
+                sprintf(lineTwo, "E: %1.2fV B: %1.2fV", SensorValue[powerExpander]/182.4, BackupBatteryLevel/1000.0);
                 break;
             case 0:
                 sprintf(lineOne, "%d,%d", motor[FlywheelA], motor[FlywheelB]);
@@ -81,6 +81,7 @@ int lcdPick(int line, char * leftOption, char * rightOption) {
         strncat(buffer, rightOption, sizeof(rightOption));
 
         displayLCDCenteredString(line, buffer); // All UI components, by default, display on line 1
+        wait1Msec(140);
     }
     lcdClear();
     return choice;
@@ -124,10 +125,44 @@ int lcdMenu(int line, string * options, int size) {
     return choice;
 }
 
+int lcdConfirm(char * lineOne, char * lineTwo, int confirmCode, int rejectCode) {
+    while(true) {
+        displayLCDCenteredString(lineOne);
+        displayLCDCenteredString(lineTwo);
+
+        if(nLCDButtons == confirmCode) {
+            return 1;
+        }
+
+        if(nLCDButtons == rejectCode) {
+            return 0;
+        }
+
+        wait1Msec(140);
+    }
+}
+
 
 void lcdStartup() {
 	bLCDBacklight = true;
     lcdClear();
+
+    // Battery Checks
+    string voltage;
+    if(nImmediateBatteryLevel/1000.0 < 8.2) {
+        sprintf(voltage, "%fV")
+        lcdConfirm("Check: Main", voltage);
+    }
+
+    if(SensorValue[powerExpander]/182.4 < 8.5) {
+        sprintf(voltage, "%fV")
+        lcdConfirm("Check: PE", voltage);
+    }
+
+    if(BackupBatteryLevel/1000.0 < 8) {
+        sprintf(voltage, "%fV")
+        lcdConfirm("Check: Backup", voltage);
+    }
 
     displayLCDCenteredString(0, "Secure the Flag");
     displayLCDCenteredString(1, "3796B");
