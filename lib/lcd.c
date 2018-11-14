@@ -127,8 +127,8 @@ int lcdMenu(int line, string * options, int size) {
 
 int lcdConfirm(char * lineOne, char * lineTwo, int confirmCode, int rejectCode) {
     while(true) {
-        displayLCDCenteredString(lineOne);
-        displayLCDCenteredString(lineTwo);
+        displayLCDCenteredString(1, lineOne);
+        displayLCDCenteredString(2, lineTwo);
 
         if(nLCDButtons == confirmCode) {
             return 1;
@@ -148,21 +148,21 @@ void lcdStartup() {
     lcdClear();
 
     // Battery Checks
-    string voltage;
-    if(nImmediateBatteryLevel/1000.0 < 8.2) {
-        sprintf(voltage, "%fV")
-        lcdConfirm("Check: Main", voltage);
-    }
+    // string voltage;
+    // if(nImmediateBatteryLevel/1000.0 < 8.2) {
+    //     sprintf(voltage, "%fV");
+    //     lcdConfirm("Check: Main", voltage, kButtonCenter, kButtonLeft);
+    // }
 
-    if(SensorValue[powerExpander]/182.4 < 8.5) {
-        sprintf(voltage, "%fV")
-        lcdConfirm("Check: PE", voltage);
-    }
+    // if(SensorValue[powerExpander]/182.4 < 8.5) {
+    //     sprintf(voltage, "%fV");
+    //     lcdConfirm("Check: PE", voltage, kButtonCenter, kButtonLeft);
+    // }
 
-    if(BackupBatteryLevel/1000.0 < 8) {
-        sprintf(voltage, "%fV")
-        lcdConfirm("Check: Backup", voltage);
-    }
+    // if(BackupBatteryLevel/1000.0 < 8) {
+    //     sprintf(voltage, "%fV");
+    //     lcdConfirm("Check: Backup", voltage, kButtonCenter, kButtonLeft);
+    // }
 
     displayLCDCenteredString(0, "Secure the Flag");
     displayLCDCenteredString(1, "3796B");
