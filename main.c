@@ -7,8 +7,8 @@
 #pragma config(Sensor, dgtl8,  rightDrive,     sensorQuadEncoder)
 #pragma config(Motor,  port1,           Uptake,        tmotorVex393_HBridge, openLoop, reversed)
 #pragma config(Motor,  port2,           FlywheelA,     tmotorVex393_MC29, openLoop, reversed)
-#pragma config(Motor,  port3,           DriveFL,       tmotorVex393TurboSpeed_MC29, openLoop)
-#pragma config(Motor,  port4,           DriveFR,       tmotorVex393TurboSpeed_MC29, openLoop)
+#pragma config(Motor,  port3,           DriveFR,       tmotorVex393TurboSpeed_MC29, openLoop)
+#pragma config(Motor,  port4,           DriveFL,       tmotorVex393TurboSpeed_MC29, openLoop)
 #pragma config(Motor,  port5,           CapFlipper,    tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port6,           Intake,        tmotorVex393_MC29, openLoop, reversed)
 #pragma config(Motor,  port7,           DriveBL,       tmotorVex393TurboSpeed_MC29, openLoop)
@@ -112,6 +112,9 @@ task autonomous() {
 /*---------------------------------------------------------------------------*/
 
 task usercontrol() {
+
+  targetTBH(robot.flywheel, 2500);
+
   while (true) {
 
     wait1Msec(20);

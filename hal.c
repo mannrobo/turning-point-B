@@ -29,6 +29,9 @@ typedef struct {
     motorMode intake;
     motorMode uptake;
 
+    // Cap Flipper power
+    int capFlipper;
+
 } HardwareAbstraction;
 
 
@@ -74,6 +77,14 @@ void controllerStep() {
         targetTBH(robot.flywheel, 0);
     }
 
+    // Cap Flipper
+    if(vexRT[Btn8U]) {
+        robot.capFlipper = -80;
+    } else if(vexRT[Btn8D]) {
+        robot.capFlipper = 80;
+    } else {
+        robot.capFlipper = 0;
+    }
 }
 
 void driveStep() {
@@ -127,6 +138,8 @@ task hardwareAbstractionLayer() {
                 motorTarget[Uptake] = 0;
                 break;
         }
+
+        motorTarget[CapFlipper] = robot.capFlipper;
 
         motorControlStep();
         wait1Msec(20);
