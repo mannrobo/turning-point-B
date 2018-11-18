@@ -1,6 +1,6 @@
 /**
  * Take Back Half
- * Algorithm used for the flywgheel because PID tuning a flywheel is tough
+ * Algorithm used for the flywheel because PID tuning a flywheel is tough
  *
  * Inspirations:
  *  - https://www.chiefdelphi.com/forums/showpost.php?p=1247916
@@ -9,7 +9,10 @@
  *  - https://www.vexforum.com/index.php/14654-team-929w-early-season-robot-reveal/p1#p133956
  *  - https://github.com/team751/2013RobotCode/blob/master/src/org/team751/speedcontrol/TakeBackHalfSpeedController.java
  *
- *
+ * Take Back Half is a simple algorithm originalled used it temperature control, but was found to be incredibly
+ * useful for flywheels. Like most control systems, it consists of a desired value, known as the setpoint,
+ * and the actual measured variable, called the process. In order to spin up, Take Back Half sets the output to
+ * the integral of the gain parameter multiplied by the current error (difference between setpoint and process)
  */
 
 typedef struct {
@@ -35,7 +38,7 @@ typedef struct {
     // Output
     float output;
 
-    // RPM at Max Power (basically free spin * gear ration)
+    // RPM at Max Power (basically gear ratio * free speed based on internal gearing)
     float maxRPM;
 
     // For calculating the process
@@ -67,7 +70,6 @@ void stepTBH(TBHController & controller) {
     if(controller.setpoint == 0) {
         controller.output = 0;
     }
-
 
     // Calculate Error
     controller.error = controller.setpoint - controller.process;
