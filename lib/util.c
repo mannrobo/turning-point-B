@@ -58,33 +58,13 @@ int encoderDirect(int lastValue, int measuredValue, int pwm) {
  **/
 int rescaleTo(int max, int alpha, int beta, int side) {
   if (alpha <= max && beta <= max) return side ? beta : alpha; // If no sclaing is needed, return
-  
+
   float scalar = alpha > beta ? (float) max / (float) alpha : (float) max / (float) beta;
   return (int)(side ? beta * scalar : alpha * scalar);
 }
 
 
 
-#define TURBO 2.4
-#define HIGHSPEED 1.6
-#define TORQUE 1
-
-/**
- * Converts inches to quadrature encoder ticks, for the purpose of setting targets in PIDs
- * Usage:
- *  inchesToTicks(10, 3.25, 1, TURBO);
- *
- * @param float unit The number inches to convert to ticks
- * @param float wheelDiameter The diameter of the wheel, in inches
- * @param float gearing The external gear ration (Speed Up => x, Torque Up => 1/x)
- * @param float motorGear The internal gear ratio of the motor (constants TURBO, HIGHSPEED, and TORQUE have been specified)
- */
-float inchesToTicks(float unit, float wheelDiameter, float gearing, float motorGear) {
-    return (
-        (unit / (motorGear * gearing)) / // Cancel out gear ratio
-        (wheelDiameter * PI) // Divide by circumfrence to solve for rotations
-    ) * 360; // 360 ticks in a rotation
-}
 
 #define STRTOK_MAX_TOKEN_SIZE 20
 #define STRTOK_MAX_BUFFER_SIZE 50
