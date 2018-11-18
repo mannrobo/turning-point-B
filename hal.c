@@ -41,34 +41,28 @@ HardwareAbstraction robot;
  * Individual subsystem control
  */
 void controllerStep() {
-    // Drive, with secret sauce!
-    int forward = abs(vexRT[Ch3]) > 40 ? vexRT[Ch3] : 0,
-        turn = abs(vexRT[Ch4]) > 40 ? vexRT[Ch4] * 0.7 : 0,
-        left = forward + turn,
-        right = forward - turn;
+    // Arcade Drive
+    int forward = abs(vexRT[Ch3]) > 32 ? vexRT[Ch3] : 0,
+        turn = abs(vexRT[Ch4]) > 40 ? vexRT[Ch4] * 0.7 : 0;
 
-    robot.leftDrive = sgn(left) * rescaleTo(127, abs(left), abs(right), 0);
-    robot.rightDrive = sgn(right) * rescaleTo(127, abs(left), abs(right), 1);
+    robot.leftDrive = forward + turn;
+    robot.rightDrive = forward - turn;
 
     // Intake
-    if((vexRT[Btn5U] && robot.intake == FORWARD) || (vexRT[Btn5D] && robot.intake == REVERSE)) {
-        robot.intake = STOP;
-    } else if(vexRT[Btn5U]) {
-        robot.intake = FORWARD;
-    } else if (vexRT[Btn5D]) {
+    if(vexRT[Btn6U]) {
         robot.intake = REVERSE;
-    }
-
-    // Uptake
-    if((vexRT[Btn6U] && robot.uptake == FORWARD) || (vexRT[Btn6D] && robot.uptake == REVERSE)) {
-        robot.uptake = STOP;
-    } else if(vexRT[Btn6U]) {
-        robot.uptake = REVERSE;
     } else if (vexRT[Btn6D]) {
-        robot.uptake = FORWARD;
+        robot.intake = FORWARD;     ;
+    }
+    
+    // Uptake
+    if(vexRT[Btn5U]) {
+        robot.uptake = REVERSE;
+    } else if (vexRT[Btn5D]) {
+        robot.uptake = STOP;
     }
 
-    // Flywheel (temporary)
+    // Flywheel
     if(vexRT[Btn7U]) {
         targetTBH(robot.flywheel, 2500);
     } else if(vexRT[Btn7R]) {
