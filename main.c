@@ -102,8 +102,7 @@ task autonomous() {
 
   robot.uptake = REVERSE;
   drive(1200);
-  drive(-1200);
-
+  drive(-1100);
 
   if(match.alliance == ALLIANCE_BLUE) {
     turn(-120);
