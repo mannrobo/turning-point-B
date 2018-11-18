@@ -3,6 +3,7 @@
  **/
 
 #pragma systemFile
+#include "./auton.c"
 
 
 void lcdClear() {
@@ -147,26 +148,13 @@ void lcdStartup() {
 	bLCDBacklight = true;
     lcdClear();
 
-    // Battery Checks
-    // string voltage;
-    // if(nImmediateBatteryLevel/1000.0 < 8.2) {
-    //     sprintf(voltage, "%fV");
-    //     lcdConfirm("Check: Main", voltage, kButtonCenter, kButtonLeft);
-    // }
-
-    // if(SensorValue[powerExpander]/182.4 < 8.5) {
-    //     sprintf(voltage, "%fV");
-    //     lcdConfirm("Check: PE", voltage, kButtonCenter, kButtonLeft);
-    // }
-
-    // if(BackupBatteryLevel/1000.0 < 8) {
-    //     sprintf(voltage, "%fV");
-    //     lcdConfirm("Check: Backup", voltage, kButtonCenter, kButtonLeft);
-    // }
 
     displayLCDCenteredString(0, "Secure the Flag");
     displayLCDCenteredString(1, "3796B");
     wait1Msec(1000);
+
+    displayLCDCenteredString(0, "Alliance");
+    match.alliance = lcdPick(1, "Red", "Blue");
 
     lcdClear();
 }
