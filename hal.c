@@ -98,7 +98,7 @@ void flywheelStep() {
 }
 
 task hardwareAbstractionLayer() {
-    initTBH(robot.flywheel, 0.0015, 2500, flywheelRot, 5.0);
+    initTBH(robot.flywheel, 0.0015, 3500, flywheelRot, 5.0);
     targetTBH(robot.flywheel, 0);
 
     while(true) {
