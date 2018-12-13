@@ -32,6 +32,15 @@ typedef struct {
     // Cap Flipper power
     int capFlipper;
 
+    // Fire Button -- Robot should fire ball when ready
+    bool firing;
+
+    // Ball is ready to fire
+    bool ballLoaded;
+
+    // Uptake override
+    motorMode uptakeOverride;
+
 } HardwareAbstraction;
 
 
@@ -52,14 +61,7 @@ void controllerStep() {
     if(vexRT[Btn6U]) {
         robot.intake = REVERSE;
     } else if (vexRT[Btn6D]) {
-        robot.intake = FORWARD;     ;
-    }
-    
-    // Uptake
-    if(vexRT[Btn5U]) {
-        robot.uptake = REVERSE;
-    } else if (vexRT[Btn5D]) {
-        robot.uptake = STOP;
+        robot.intake = FORWARD;
     }
 
     // Flywheel
@@ -69,6 +71,15 @@ void controllerStep() {
         targetTBH(robot.flywheel, 1800);
     } else if(vexRT[Btn7D]) {
         targetTBH(robot.flywheel, 0);
+    }
+
+    // Fire Control
+    if(vexRT[Btn5U]) {
+        robot.firing = true;
+    } else if(vexRT[Btn5D]) {
+        robot.uptakeOverride = FORWARD;
+    } else {
+        robot.uptakeOverride = STOP;
     }
 
     // Cap Flipper
@@ -90,6 +101,28 @@ void driveStep() {
 }
 
 void flywheelStep() {
+    // Firing Control
+    robot.ballLoaded = (bool) SensorValue[indexer];
+
+    // If we've fired the ball, reset
+    if(!robot.ballLoaded && robot.firing) {
+        robot.firing = false;
+    // Fire the ball if the conditions are met (loaded, flywheel's right, fire command)
+    } else if(robot.ballLoaded &&
+       robot.firing &&
+       abs(robot.flywheel.error) < 100
+    ) {
+        robot.uptake = REVERSE;
+    // If we're not firing, move the balls into firing position
+    } else if(!robot.ballLoaded && !robot.firing) {
+        robot.uptake = REVERSE;
+        // Stop the firing to prevent accidental shooting
+    } else {
+        robot.uptake = STOP;
+    }
+
+
+    // Flywheel Itself
     calculateProcessTBH(robot.flywheel);
     stepTBH(robot.flywheel);
 
@@ -121,6 +154,11 @@ task hardwareAbstractionLayer() {
                 break;
         }
 
+        // Manual override of the uptake (in case of ball getting stuck)
+        if(robot.uptakeOverride != STOP) {
+            robot.uptake = robot.uptakeOverride;   
+        }
+
         switch(robot.uptake) {
             case FORWARD:
                 motorTarget[Uptake] = 127;
@@ -132,6 +170,8 @@ task hardwareAbstractionLayer() {
                 motorTarget[Uptake] = 0;
                 break;
         }
+
+
 
         motorTarget[CapFlipper] = robot.capFlipper;
 

@@ -24,17 +24,17 @@ task lcdDebug() {
         string lineTwo;
 
         switch(lcdDebugSlot) {
-            // Specialized displays for specific situations, not useful in general debug mode
 
 
             // Normal access displays
-            case 1:
-                sprintf(lineOne, "M: %1.2fV", nImmediateBatteryLevel/1000.0);
-                sprintf(lineTwo, "E: %1.2fV B: %1.2fV", SensorValue[powerExpander]/182.4, BackupBatteryLevel/1000.0);
-                break;
+   
             case 0:
                 sprintf(lineOne, "%d,%d", motor[FlywheelA], motor[FlywheelB]);
                 sprintf(lineTwo, "%1.2f-%1.2f", robot.flywheel.setpoint, robot.flywheel.process);
+                break;
+            case 1:
+                sprintf(lineOne, "M: %1.2fV", nImmediateBatteryLevel/1000.0);
+                sprintf(lineTwo, "E: %1.2fV B: %1.2fV", SensorValue[powerExpander]/182.4, BackupBatteryLevel/1000.0);
                 break;
             case 2:
                 sprintf(lineOne, "%d,%d", robot.leftDrive, robot.rightDrive);
@@ -43,6 +43,10 @@ task lcdDebug() {
             case 3:
                 sprintf(lineOne, "%d,%d", robot.leftDrive, robot.rightDrive);
                 sprintf(lineTwo, "%d,%d,%f", SensorValue[leftDrive], SensorValue[rightDrive], SensorValue[gyro]);
+                break;
+            case 4:
+                sprintf(lineOne, "INDEXER: %s", SensorValue[indexer] ? "BALL" : "NO BALL")
+                sprintf(lineTwo, "");
                 break;
             default:
                 sprintf(lineOne, "LCD DEBUG SYSTEM");
@@ -88,6 +92,8 @@ int lcdPick(int line, char * leftOption, char * rightOption) {
     return choice;
 
 }
+
+
 
 /**
  * UI Component: Pick between multiple options
