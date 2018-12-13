@@ -60,11 +60,8 @@ void drive(int distance) {
 
 // Turns using gyro
 void turn(float degrees) {
-    configurePID(robot.turnController, 0.85, 0, 0);
+    configurePID(robot.turnController, 1.25, 0, 0);
     targetPID(robot.turnController, degrees);
-
-
-    SensorValue[gyro] = 0;
 
     do {
         robot.turnController.value = SensorValue[gyro] / 10;
