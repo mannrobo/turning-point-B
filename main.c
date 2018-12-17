@@ -45,7 +45,7 @@ void pre_auton() {
   // Set bStopTasksBetweenModes to false if you want to keep user created tasks
   // running between Autonomous and Driver controlled modes. You will need to
   // manage all user created tasks if set to false.
-  bStopTasksBetweenModes = false;
+  bStopTasksBetweenModes = true;
   bDisplayCompetitionStatusOnLcd = false;
 
   SensorType[gyro] = sensorNone;
@@ -60,12 +60,14 @@ void pre_auton() {
   SensorValue[leftDrive] = 0;
   SensorValue[rightDrive] = 0;
 
+  startTask(lcdDebug)
 
-  startTask(lcdDebug);
-  startTask(hardwareAbstractionLayer);
 }
 
 task autonomous() {
+
+	startTask(hardwareAbstractionLayer);
+  startTask(lcdDebug);
 
   // Turn on Flywheel, and wait for it to speed up
   targetTBH(robot.flywheel, 2400);
@@ -130,6 +132,10 @@ if(match.alliance == ALLIANCE_BLUE) {
 }
 
 task usercontrol() {
+
+  startTask(hardwareAbstractionLayer);
+  startTask(lcdDebug);
+
   while (true) {
     wait1Msec(20);
   }
