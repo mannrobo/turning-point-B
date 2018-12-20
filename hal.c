@@ -102,7 +102,7 @@ void driveStep() {
 
 void flywheelStep() {
     // Firing Control
-    robot.ballLoaded = (bool) SensorValue[indexer];
+    robot.ballLoaded = SensorValue[ballDetector] <= 6
 
     // If we've fired the ball, reset
     if(!robot.ballLoaded && robot.firing) {
@@ -156,7 +156,7 @@ task hardwareAbstractionLayer() {
 
         // Manual override of the uptake (in case of ball getting stuck)
         if(robot.uptakeOverride != STOP) {
-            robot.uptake = robot.uptakeOverride;   
+            robot.uptake = robot.uptakeOverride;
         }
 
         switch(robot.uptake) {

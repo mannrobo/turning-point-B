@@ -3,7 +3,7 @@
 #pragma config(Sensor, in1,    gyro,           sensorGyro)
 #pragma config(Sensor, in2,    powerExpander,  sensorAnalog)
 #pragma config(Sensor, dgtl1,  flywheelRot,    sensorQuadEncoder)
-#pragma config(Sensor, dgtl3,  indexer,        sensorTouch)
+#pragma config(Sensor, dgtl3,  ballDetector,   sensorSONAR_cm)
 #pragma config(Sensor, dgtl6,  leftDrive,      sensorQuadEncoder)
 #pragma config(Sensor, dgtl8,  rightDrive,     sensorQuadEncoder)
 #pragma config(Motor,  port1,           Uptake,        tmotorVex393_HBridge, openLoop, reversed)

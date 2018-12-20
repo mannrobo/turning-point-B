@@ -45,7 +45,7 @@ task lcdDebug() {
                 sprintf(lineTwo, "%d,%d,%f", SensorValue[leftDrive], SensorValue[rightDrive], SensorValue[gyro]);
                 break;
             case 4:
-                sprintf(lineOne, "INDEXER: %s", SensorValue[indexer] ? "BALL" : "NO BALL")
+                sprintf(lineOne, "INDEXER: %d", robot.ballLoaded)
                 sprintf(lineTwo, "");
                 break;
             default:
