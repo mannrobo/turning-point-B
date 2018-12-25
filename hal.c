@@ -102,7 +102,7 @@ void driveStep() {
 
 void flywheelStep() {
     // Firing Control
-    robot.ballLoaded = SensorValue[ballDetector] <= 6
+    robot.ballLoaded = SensorValue[ballDetector] <= 8
 
     // If we've fired the ball, reset
     if(!robot.ballLoaded && robot.firing) {
@@ -110,7 +110,7 @@ void flywheelStep() {
     // Fire the ball if the conditions are met (loaded, flywheel's right, fire command)
     } else if(robot.ballLoaded &&
        robot.firing &&
-       abs(robot.flywheel.error) < 100
+       abs(robot.flywheel.error) < 250
     ) {
         robot.uptake = REVERSE;
     // If we're not firing, move the balls into firing position
