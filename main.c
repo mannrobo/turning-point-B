@@ -60,7 +60,7 @@ void pre_auton() {
   SensorValue[leftDrive] = 0;
   SensorValue[rightDrive] = 0;
 
-  startTask(lcdDebug)
+  startTask(lcdDebug);
 
 }
 
