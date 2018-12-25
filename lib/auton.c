@@ -4,6 +4,7 @@
 
 #include "../hal.c"
 #include "pid.c"
+#include "lcd.c"
 
 #define ALLIANCE_RED  0
 #define ALLIANCE_BLUE 1
@@ -46,8 +47,6 @@ void drive(int distance) {
     while(abs(SensorValue[leftDrive]) < abs(distance)) {
         robot.leftDrive = sgn(distance) * 80;
         robot.rightDrive = sgn(distance) * 80;
-        
-        writeDebugStreamLine("%d, %d", SensorValue[leftDrive], distance);
 
         wait1Msec(20);
     }
@@ -60,7 +59,7 @@ void drive(int distance) {
 
 // Turns using gyro
 void turn(float degrees) {
-    configurePID(robot.turnController, 1.25, 0, 0);
+    configurePID(robot.turnController, 1.9, 0, 0);
     targetPID(robot.turnController, degrees);
 
     do {
@@ -68,11 +67,57 @@ void turn(float degrees) {
         stepPID(robot.turnController);
 
         // Clamp turns even if the error is greater. This will work to prevent overshoot
-        robot.leftDrive = -clamp(abs(robot.turnController.output), 0, 70) * sgn(robot.turnController.output);
-        robot.rightDrive = clamp(abs(robot.turnController.output), 0, 70) * sgn(robot.turnController.output);
+        robot.leftDrive = -clamp(abs(robot.turnController.output), 0, 50) * sgn(robot.turnController.output);
+        robot.rightDrive = clamp(abs(robot.turnController.output), 0, 50) * sgn(robot.turnController.output);
 
     } while(abs(robot.turnController.error) > 50)
 
     robot.leftDrive = 0;
     robot.rightDrive = 0;
+}
+
+void fire() {
+    robot.firing = true;
+    while(robot.ballLoaded)  {
+        wait1Msec(20);
+    }
+}
+
+
+/**
+ * Routines!
+ */
+
+// Routine 1: Closest to flag
+
+void autonOne() {
+    // Turn on Flywheel and start intake
+    targetTBH(robot.flywheel, 3200);
+    robot.intake = FORWARD;
+
+    writeDebugStreamLine("forward");
+    drive(1100);
+    writeDebugStreamLine("back");
+    drive(-1100);
+
+    writeDebugStreamLine("turn");
+
+    if(match.alliance = ALLIANCE_BLUE) {
+        turn(-90);
+    } else {
+        turn(90);
+    }
+
+    writeDebugStreamLine("fire");
+
+    fire();
+}
+
+
+void autonTestFlywheel() {
+    targetTBH(robot.flywheel, 2500);
+    robot.intake = FORWARD;
+    while(true) {
+        fire();
+    }
 }

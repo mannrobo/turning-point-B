@@ -3,9 +3,9 @@
 #pragma config(Sensor, in1,    gyro,           sensorGyro)
 #pragma config(Sensor, in2,    powerExpander,  sensorAnalog)
 #pragma config(Sensor, dgtl1,  flywheelRot,    sensorQuadEncoder)
-#pragma config(Sensor, dgtl3,  ballDetector,   sensorSONAR_cm)
 #pragma config(Sensor, dgtl6,  leftDrive,      sensorQuadEncoder)
 #pragma config(Sensor, dgtl8,  rightDrive,     sensorQuadEncoder)
+#pragma config(Sensor, dgtl11, ballDetector,   sensorSONAR_cm)
 #pragma config(Motor,  port1,           Uptake,        tmotorVex393_HBridge, openLoop, reversed)
 #pragma config(Motor,  port2,           FlywheelA,     tmotorVex393_MC29, openLoop)
 #pragma config(Motor,  port3,           DriveFR,       tmotorVex393TurboSpeed_MC29, openLoop)
@@ -19,7 +19,7 @@
 
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
-/*        Description: Competition template for VEX EDR                      */
+/*        Description: Com	petition template for VEX EDR                      */
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
 
@@ -45,7 +45,7 @@ void pre_auton() {
   // Set bStopTasksBetweenModes to false if you want to keep user created tasks
   // running between Autonomous and Driver controlled modes. You will need to
   // manage all user created tasks if set to false.
-  bStopTasksBetweenModes = true;
+  bStopTasksBetweenModes = false;
   bDisplayCompetitionStatusOnLcd = false;
 
   SensorType[gyro] = sensorNone;
@@ -69,66 +69,7 @@ task autonomous() {
 	startTask(hardwareAbstractionLayer);
   startTask(lcdDebug);
 
-  // Turn on Flywheel, and wait for it to speed up
-  targetTBH(robot.flywheel, 2400);
-  while(robot.flywheel.process < 2400) {
-    wait1Msec(20);
-  }
-  wait1Msec(400);
-
-  // Turn on the uptakeA
-  robot.uptake = REVERSE;
-  wait1Msec(500);
-
-  robot.leftDrive = 80;
-  robot.rightDrive = 80;
-  wait1Msec(50);
-  robot.leftDrive = 0;
-  robot.rightDrive = 0;
-
-  // Turn to face the inside of the field
-  // Positive is for blue, negative for red
-  if(match.alliance == ALLIANCE_BLUE) {
-    turn(100);
-  } else {
-    turn(-100);
-  }
-
-  robot.intake = REVERSE;
-  robot.uptake = STOP;
-  wait1Msec(200);
-
-  // Wall sqaure (not distance so it happens for a short time)
-  robot.leftDrive = -60;
-  robot.rightDrive = -60;
-  wait1Msec(400);
-
-  // Set to low target
-  targetTBH(robot.flywheel, 2000);
-  robot.uptake = REVERSE;
-
-  drive(1300);
-  // Go backward for just a moment, to ensure the cap is flipped
-  // And that the ball has been picked up
-  drive(-1300);
-
-if(match.alliance == ALLIANCE_BLUE) {
-    turn(0);
-  } else {
-    turn(0);
-  }
-
-  // Shoot last ball
-
-  robot.uptake = REVERSE;
-  wait1Msec(2100);
-
-
-
-  // // Alliance Park
-  // drive(-900);
-
-
+  autonOne();
 }
 
 task usercontrol() {
