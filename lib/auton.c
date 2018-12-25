@@ -57,23 +57,29 @@ void drive(int distance) {
 }
 
 
-// Turns using gyro
-void turn(float degrees) {
-    configurePID(robot.turnController, 1.9, 0, 0);
-    targetPID(robot.turnController, degrees);
+/**
+ * Find the "absolute" gyro position (Always 0 - 360)
+ */
+int gyroAbsolute(tSensors gyro) {
+    return ((SensorValue[gyro] < 0 ? 3600 - SensorValue[gyro] : SensorValue[gyro]) % 3600) / 10;
+}
 
-    do {
-        robot.turnController.value = SensorValue[gyro] / 10;
-        stepPID(robot.turnController);
+/**
+ * Turns to face a particular degree mark (0 = forward, 90 = left?)
+ * NOTE: As per reccomendation by 5225A, turns are ABSOLUTE.
+ * This means a call to turn(0) will translate to the robot
+ * turning to face its starting position
+ * Negative degrees will turn left, and positive degrees will turn right
+ */
+void turn(int degrees) {
+    // Convert target and actual to absolute degree indications (0-360 degrees)
+    int target = (degrees < 0 ? 360 - degrees : degrees) % 360;
+    int inital  = gyroAbsolute(gyro);
 
-        // Clamp turns even if the error is greater. This will work to prevent overshoot
-        robot.leftDrive = -clamp(abs(robot.turnController.output), 0, 50) * sgn(robot.turnController.output);
-        robot.rightDrive = clamp(abs(robot.turnController.output), 0, 50) * sgn(robot.turnController.output);
+    // Decide the direction to turn based on start and target (target > start means positive multiplier)
+    int direction = sgn(target - inital);
 
-    } while(abs(robot.turnController.error) > 50)
 
-    robot.leftDrive = 0;
-    robot.rightDrive = 0;
 }
 
 void fire() {
@@ -102,7 +108,7 @@ void autonOne() {
 
     writeDebugStreamLine("turn");
 
-    if(match.alliance = ALLIANCE_BLUE) {
+    if(match.alliance == ALLIANCE_BLUE) {
         turn(-90);
     } else {
         turn(90);
@@ -120,4 +126,9 @@ void autonTestFlywheel() {
     while(true) {
         fire();
     }
+}
+
+void autonSquareDance() {
+    turn(90);
+    drive(300);
 }

@@ -14,7 +14,7 @@ void lcdClear() {
 
 int lcdDebugSlot = 0;
 
-int lcdDisplayDebug(int slot) {
+void lcdDisplayDebug(int slot) {
     lcdDebugSlot = slot;
 }
 
@@ -46,10 +46,10 @@ task lcdDebug() {
                 break;
             case 3:
                 sprintf(lineOne, "%d,%d", robot.leftDrive, robot.rightDrive);
-                sprintf(lineTwo, "%d,%d,%f", SensorValue[leftDrive], SensorValue[rightDrive], SensorValue[gyro]);
+                sprintf(lineTwo, "%d,%d,%f", SensorValue[leftDrive], SensorValue[rightDrive], gyroAbsolute(gyro));
                 break;
             case 4:
-                sprintf(lineOne, "INDEXER: %s", robot.ballLoaded ? "BALL" : "NO BALL")
+                sprintf(lineOne, "INDEXER: %s", robot.ballLoaded ? "BALL" : "NO BALL");
                 sprintf(lineTwo, "%d", SensorValue[ballDetector]);
                 break;
             default:
