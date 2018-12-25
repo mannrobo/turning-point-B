@@ -102,7 +102,7 @@ void driveStep() {
 
 void flywheelStep() {
     // Firing Control
-    robot.ballLoaded = SensorValue[ballDetector] <= 8
+    robot.ballLoaded = SensorValue[ballDetector] <= 8;
 
     // If we've fired the ball, reset
     if(!robot.ballLoaded && robot.firing) {
