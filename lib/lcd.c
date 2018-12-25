@@ -14,6 +14,10 @@ void lcdClear() {
 
 int lcdDebugSlot = 0;
 
+int lcdDisplayDebug(int slot) {
+    lcdDebugSlot = slot;
+}
+
 task lcdDebug() {
     while(true) {
         if (nLCDButtons == kButtonLeft && lcdDebugSlot > 0) lcdDebugSlot--;
@@ -27,14 +31,14 @@ task lcdDebug() {
 
 
             // Normal access displays
-   
+
             case 0:
                 sprintf(lineOne, "%d,%d", motor[FlywheelA], motor[FlywheelB]);
                 sprintf(lineTwo, "%1.2f-%1.2f", robot.flywheel.setpoint, robot.flywheel.process);
                 break;
             case 1:
                 sprintf(lineOne, "M: %1.2fV", nImmediateBatteryLevel/1000.0);
-                sprintf(lineTwo, "E: %1.2fV B: %1.2fV", SensorValue[powerExpander]/182.4, BackupBatteryLevel/1000.0);
+                sprintf(lineTwo, "E: %1.2fV B: %1.2fV", SensorValue[powerExpander]/270.0, BackupBatteryLevel/1000.0);
                 break;
             case 2:
                 sprintf(lineOne, "%d,%d", robot.leftDrive, robot.rightDrive);
@@ -45,8 +49,8 @@ task lcdDebug() {
                 sprintf(lineTwo, "%d,%d,%f", SensorValue[leftDrive], SensorValue[rightDrive], SensorValue[gyro]);
                 break;
             case 4:
-                sprintf(lineOne, "INDEXER: %d", robot.ballLoaded)
-                sprintf(lineTwo, "");
+                sprintf(lineOne, "INDEXER: %s", robot.ballLoaded ? "BALL" : "NO BALL")
+                sprintf(lineTwo, "%d", SensorValue[ballDetector]);
                 break;
             default:
                 sprintf(lineOne, "LCD DEBUG SYSTEM");
