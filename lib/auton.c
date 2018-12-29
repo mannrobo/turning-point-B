@@ -14,6 +14,8 @@
 #define HIGHSPEED 1.6
 #define TORQUE 1
 
+#pragma systemFile
+
 /**
  * Converts inches to quadrature encoder ticks, for the purpose of setting targets in PIDs
  * Usage:
@@ -79,12 +81,12 @@ void turn(int degrees) {
     targetPID(robot.turnController, degrees);
 
     do {
-        robot.turnController.value = SensorValue[gyro] / 10.0
+        robot.turnController.value = SensorValue[gyro] / 10.0;
         stepPID(robot.turnController);
 
-        robot.leftDrive = -robot.turnController.output
-        robot.rightDrive = robot.turnController.output
-    } while(abs(robot.turnController.output) > 20)
+        robot.leftDrive = -robot.turnController.output;
+        robot.rightDrive = robot.turnController.output;
+    } while(abs(robot.turnController.output) > 20);
 
     robot.leftDrive = 0;
     robot.rightDrive = 0;
@@ -92,7 +94,7 @@ void turn(int degrees) {
 
 void fire() {
     robot.firing = true;
-    while(robot.ballLoaded)  {
+    while(robot.firing)  {
         wait1Msec(20);
     }
 }
