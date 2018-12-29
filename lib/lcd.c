@@ -19,13 +19,13 @@ void lcdDisplayDebug(int slot) {
 
 /**
  * Determines if its okay for LCD UI prompts to continue to block execution
- * 
+ *
  * If the robot is not connected to competition control, then there is no "dire"
  * circumstance, and prompts can block indefinitely. However, if the robot *is*
  * connected, then it will only allow prompts to go when the robot is disabled
  **/
 bool lcdUIOkay() {
-    return nVexRCReceiveState & vrCompetitionSwitch ? bIfiRobotDisabled : true
+    return nVexRCReceiveState & vrCompetitionSwitch ? bIfiRobotDisabled : true;
 }
 
 
@@ -162,6 +162,9 @@ int lcdConfirm(char * lineOne, char * lineTwo, int confirmCode, int rejectCode) 
 
         wait1Msec(140);
     }
+
+    // Confirm if interrupted
+    return 1;
 }
 
 
@@ -177,7 +180,9 @@ void lcdStartup() {
     displayLCDCenteredString(0, "Alliance");
     match.alliance = lcdPick(1, "Red", "Blue");
 
-    string * autons = {"Match #1", "ProgSkill"}
+    wait1Msec(1000);
+
+    string autons[] = {"Match #1", "ProgSkill"};
 
     displayLCDCenteredString(0, "Auton");
     match.auton = lcdMenu(1, autons, 2);
