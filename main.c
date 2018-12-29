@@ -69,7 +69,14 @@ task autonomous() {
 	startTask(hardwareAbstractionLayer);
   startTask(lcdDebug);
 
-  autonOne();
+  switch(match.auton) {
+    case 0:
+      autonOne();
+      break;
+    case 1:
+      autonProgSkills();
+      break;
+  }
 }
 
 task usercontrol() {
