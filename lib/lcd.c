@@ -11,12 +11,23 @@ void lcdClear() {
     clearLCDLine(1);
 }
 
-
 int lcdDebugSlot = 0;
 
 void lcdDisplayDebug(int slot) {
     lcdDebugSlot = slot;
 }
+
+/**
+ * Determines if its okay for LCD UI prompts to continue to block execution
+ * 
+ * If the robot is not connected to competition control, then there is no "dire"
+ * circumstance, and prompts can block indefinitely. However, if the robot *is*
+ * connected, then it will only allow prompts to go when the robot is disabled
+ **/
+bool lcdUIOkay() {
+    return nVexRCReceiveState & vrCompetitionSwitch ? bIfiRobotDisabled : true
+}
+
 
 task lcdDebug() {
     while(true) {
@@ -46,7 +57,7 @@ task lcdDebug() {
                 break;
             case 3:
                 sprintf(lineOne, "%d,%d", robot.leftDrive, robot.rightDrive);
-                sprintf(lineTwo, "%d,%d,%1.1f", SensorValue[leftDrive], SensorValue[rightDrive], SensorValue[gyro] / 10.0);
+                sprintf(lineTwo, "%d,%d,%1.1f", SensorValue[leftDrive], SensorValue[rightDrive], absoluteDirection(SensorValue[gyro]));
                 break;
             case 4:
                 sprintf(lineOne, "INDEXER: %s", robot.ballLoaded ? "BALL" : "NO BALL");
@@ -78,7 +89,7 @@ int lcdPick(int line, char * leftOption, char * rightOption) {
 
     clearLCDLine(line);
 
-    while(nLCDButtons != 2) {
+    while(nLCDButtons != 2 && lcdUIOkay()) {
         string buffer = "";
         if (nLCDButtons == 1) choice = 0;
         if (nLCDButtons == 4) choice = 1;
@@ -111,7 +122,7 @@ int lcdMenu(int line, string * options, int size) {
 
     clearLCDLine(line);
 
-	while(true) {
+	while(lcdUIOkay()) {
 		if (nLCDButtons == kButtonLeft && choice > 0) {
 			choice--;
 		}
@@ -137,7 +148,7 @@ int lcdMenu(int line, string * options, int size) {
 }
 
 int lcdConfirm(char * lineOne, char * lineTwo, int confirmCode, int rejectCode) {
-    while(true) {
+    while(lcdUIOkay()) {
         displayLCDCenteredString(1, lineOne);
         displayLCDCenteredString(2, lineTwo);
 
@@ -165,6 +176,11 @@ void lcdStartup() {
 
     displayLCDCenteredString(0, "Alliance");
     match.alliance = lcdPick(1, "Red", "Blue");
+
+    string * autons = {"Match #1", "ProgSkill"}
+
+    displayLCDCenteredString(0, "Auton");
+    match.auton = lcdMenu(1, autons, 2);
 
     lcdClear();
 }
