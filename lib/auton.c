@@ -33,6 +33,7 @@ float inchesToTicks(float unit, float wheelDiameter, float gearing, float motorG
 
 typedef struct {
     int alliance; // RED is 0, BLUE is 1
+    int auton; // Auton Selected (see menu)
 } matchConfiguration;
 
 matchConfiguration match;
@@ -45,8 +46,8 @@ void drive(int distance) {
     SensorValue[rightDrive] = 0;
 
     while(abs(SensorValue[leftDrive]) < abs(distance)) {
-        robot.leftDrive = sgn(distance) * 80;
-        robot.rightDrive = sgn(distance) * 80;
+        robot.leftDrive = sgn(distance) * 127;
+        robot.rightDrive = sgn(distance) * 127;
 
         wait1Msec(20);
     }
@@ -58,10 +59,10 @@ void drive(int distance) {
 
 
 /**
- * Find the "absolute" gyro position (Always 0 - 360)
+ * Find the "absolute" gyro position (Always 0 - 360) in DEGREES!
  */
-int gyroAbsolute(tSensors gyro) {
-    return ((SensorValue[gyro] < 0 ? 3600 - SensorValue[gyro] : SensorValue[gyro]) % 3600) / 10;
+float absoluteDirection(int measurement) {
+    return ((measurement < 0 ? 3600 + measurement : measurement) % 3600) / 10.0;
 }
 
 /**
@@ -72,14 +73,21 @@ int gyroAbsolute(tSensors gyro) {
  * Negative degrees will turn left, and positive degrees will turn right
  */
 void turn(int degrees) {
-    // Convert target and actual to absolute degree indications (0-360 degrees)
-    int target = (degrees < 0 ? 360 - degrees : degrees) % 360;
-    int inital  = gyroAbsolute(gyro);
 
-    // Decide the direction to turn based on start and target (target > start means positive multiplier)
-    int direction = sgn(target - inital);
+    // Configure PID
+    configurePID(robot.turnController, 1, 0, 0);
+    targetPID(robot.turnController, degrees);
 
+    do {
+        robot.turnController.value = SensorValue[gyro] / 10.0
+        stepPID(robot.turnController);
 
+        robot.leftDrive = -robot.turnController.output
+        robot.rightDrive = robot.turnController.output
+    } while(abs(robot.turnController.output) > 20)
+
+    robot.leftDrive = 0;
+    robot.rightDrive = 0;
 }
 
 void fire() {
@@ -102,9 +110,9 @@ void autonOne() {
     robot.intake = FORWARD;
 
     writeDebugStreamLine("forward");
-    drive(1100);
+    drive(600);
     writeDebugStreamLine("back");
-    drive(-1100);
+    drive(-500);
 
     writeDebugStreamLine("turn");
 
@@ -117,6 +125,23 @@ void autonOne() {
     writeDebugStreamLine("fire");
 
     fire();
+    wait1Msec(200);
+
+    drive(400);
+}
+
+void autonProgSkills() {
+    // Turn on flywheel
+    targetTBH(robot.flywheel, 2500);
+
+    // Fire preload
+    fire();
+
+    // Score low flag
+    drive(400);
+    wait1Msec(1000);
+    drive(-400);
+
 }
 
 
@@ -129,6 +154,6 @@ void autonTestFlywheel() {
 }
 
 void autonSquareDance() {
-    turn(90);
+    turn(95);
     drive(300);
 }
