@@ -182,7 +182,7 @@ void lcdStartup() {
 
     wait1Msec(1000);
 
-    string autons[] = {"Match #1", "ProgSkill"};
+    string autons[] = {"Match #1", "Prog Skill"};
 
     displayLCDCenteredString(0, "Auton");
     match.auton = lcdMenu(1, autons, 2);
