@@ -47,6 +47,32 @@ void drive(int distance) {
     SensorValue[leftDrive] = 0;
     SensorValue[rightDrive] = 0;
 
+    // Configure PID
+    configurePID(robot.driveController, 1.6, 0, 0);
+    targetPID(robot.driveController, distance);
+
+    do {
+        robot.driveController.value = SensorValue[leftDrive];
+        stepPID(robot.driveController);
+
+        robot.leftDrive = robot.driveController.output;
+        robot.rightDrive = robot.driveController.output;
+    } while(abs(robot.driveController.output) > 20);
+
+    // Break
+    robot.leftDrive  = -50 * sgn(distance);
+    robot.rightDrive = -50 * sgn(distance);
+    wait1Msec(200)
+    robot.leftDrive = 0;
+    robot.rightDrive = 0;
+
+}
+
+void driveMax(int distance) {
+
+    SensorValue[leftDrive] = 0;
+    SensorValue[rightDrive] = 0;
+
     while(abs(SensorValue[leftDrive]) < abs(distance)) {
         robot.leftDrive = sgn(distance) * 127;
         robot.rightDrive = sgn(distance) * 127;
@@ -54,6 +80,10 @@ void drive(int distance) {
         wait1Msec(20);
     }
 
+    // Break
+    robot.leftDrive  = -50 * sgn(distance);
+    robot.rightDrive = -50 * sgn(distance);
+    wait1Msec(200)
     robot.leftDrive = 0;
     robot.rightDrive = 0;
 
@@ -80,6 +110,8 @@ void turn(int degrees) {
     configurePID(robot.turnController, 1, 0, 0);
     targetPID(robot.turnController, degrees);
 
+    SensorValue[gyro] = 0;
+
     do {
         robot.turnController.value = SensorValue[gyro] / 10.0;
         stepPID(robot.turnController);
@@ -97,6 +129,14 @@ void fire() {
     while(robot.firing)  {
         wait1Msec(20);
     }
+}
+
+void wallSquare(int direction) {
+    robot.leftDrive = 80 * direction;
+    robot.rightDrive = 80 * direction;
+    wait1Msec(500);
+    robot.leftDrive = 0;
+    robot.rightDrive = 0;
 }
 
 
@@ -135,14 +175,42 @@ void autonOne() {
 void autonProgSkills() {
     // Turn on flywheel
     targetTBH(robot.flywheel, 2500);
+    robot.intake = FORWARD;
 
     // Fire preload
     fire();
 
+    // Turn off flywheel to save power
+    targetTBH(robot.flywheel, 0);
+
     // Score low flag
-    drive(400);
+    drive(650);
     wait1Msec(1000);
-    drive(-400);
+
+
+    // Drive back to first cap
+    drive(-300);
+    turn(-90);
+    wallSquare(-1);
+    robot.intake = REVERSE;
+
+    // Flip first cap
+    drive(450);
+    drive(-450);
+
+    // Return to course
+    turn(-90);
+
+
+    // Drive to next cap
+    drive(400);
+    turn(90);
+    wallSquare(-1);
+    robot.intake = FORWARD;
+
+    // Drive to pick up ball
+    drive(600);
+
 
 }
 
@@ -158,4 +226,9 @@ void autonTestFlywheel() {
 void autonSquareDance() {
     turn(95);
     drive(300);
+}
+
+
+void autonTestDrive() {
+    drive(1000);
 }
