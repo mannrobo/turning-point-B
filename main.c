@@ -2,7 +2,7 @@
 #pragma config(UART_Usage, UART2, uartNotUsed, baudRate4800, IOPins, None, None)
 #pragma config(Sensor, in1,    gyro,           sensorGyro)
 #pragma config(Sensor, in2,    powerExpander,  sensorAnalog)
-#pragma config(Sensor, dgtl1,  flywheelRot,    sensorQuadEncoder)
+#pragma config(Sensor, dgtl3,  flywheel,       sensorQuadEncoder)
 #pragma config(Sensor, dgtl6,  leftDrive,      sensorQuadEncoder)
 #pragma config(Sensor, dgtl8,  rightDrive,     sensorQuadEncoder)
 #pragma config(Sensor, dgtl11, ballDetector,   sensorSONAR_cm)
@@ -54,7 +54,7 @@ void pre_auton() {
   wait1Msec(2000);
 
   // Clear flywheel Quad Encoder
-  SensorValue[flywheelRot] = 0;
+  SensorValue[flywheel] = 0;
 
   // Clear Drive Encoders
   SensorValue[leftDrive] = 0;
@@ -74,7 +74,7 @@ task autonomous() {
       autonOne();
       break;
     case 1:
-      autonProgSkills();
+      autonTestDrive();
       break;
   }
 }
@@ -83,6 +83,7 @@ task usercontrol() {
 
   startTask(hardwareAbstractionLayer);
   startTask(lcdDebug);
+
 
   while (true) {
     wait1Msec(20);
