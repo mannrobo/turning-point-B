@@ -73,6 +73,13 @@ void controllerStep() {
         targetTBH(robot.flywheel, 0);
     }
 
+    // Manual Flywheel Control
+    if(vexRT[Btn8U] && robot.flywheel.setpoint < robot.flywheel.maxRPM) {
+        targetTBH(robot.flywheel, robot.flywheel.setpoint + 10);
+    } else if (vexRT[Btn8D] && robot.flywheel.setpoint > 0) {
+        targetTBH(robot.flywheel, robot.flywheel.setpoint - 10);
+    }
+
     // Fire Control
     if(vexRT[Btn5U]) {
         robot.firing = true;
@@ -131,7 +138,7 @@ void flywheelStep() {
 }
 
 task hardwareAbstractionLayer() {
-    initTBH(robot.flywheel, 0.0015, 3500, flywheelRot, 5.0);
+    initTBH(robot.flywheel, 0.0015, 3500, flywheel, 5.0);
     targetTBH(robot.flywheel, 0);
 
     while(true) {
