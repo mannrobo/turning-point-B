@@ -62,7 +62,7 @@ void drive(int distance) {
     // Break
     robot.leftDrive  = -50 * sgn(distance);
     robot.rightDrive = -50 * sgn(distance);
-    wait1Msec(200)
+    wait1Msec(200);
     robot.leftDrive = 0;
     robot.rightDrive = 0;
 
@@ -83,7 +83,7 @@ void driveMax(int distance) {
     // Break
     robot.leftDrive  = -50 * sgn(distance);
     robot.rightDrive = -50 * sgn(distance);
-    wait1Msec(200)
+    wait1Msec(200);
     robot.leftDrive = 0;
     robot.rightDrive = 0;
 
@@ -116,12 +116,10 @@ void turn(int degrees) {
         robot.turnController.value = SensorValue[gyro] / 10.0;
         stepPID(robot.turnController);
 
-        robot.leftDrive = -robot.turnController.output;
-        robot.rightDrive = robot.turnController.output;
+        robot.turn = -robot.turnController.output
     } while(abs(robot.turnController.output) > 20);
 
-    robot.leftDrive = 0;
-    robot.rightDrive = 0;
+    robot.turn = 0;
 }
 
 void fire() {
