@@ -44,16 +44,12 @@ task lcdDebug() {
             // Normal access displays
 
             case 0:
-                sprintf(lineOne, "%d,%d", motor[FlywheelA], motor[FlywheelB]);
+                sprintf(lineOne, "%d", motor[FlywheelOut]);
                 sprintf(lineTwo, "%1.2f-%1.2f", robot.flywheel.setpoint, robot.flywheel.process);
                 break;
             case 1:
                 sprintf(lineOne, "M: %1.2fV", nImmediateBatteryLevel/1000.0);
                 sprintf(lineTwo, "E: %1.2fV B: %1.2fV", SensorValue[powerExpander]/270.0, BackupBatteryLevel/1000.0);
-                break;
-            case 2:
-                sprintf(lineOne, "%d,%d", robot.leftDrive, robot.rightDrive);
-                sprintf(lineTwo, "%d,%d,%d,%d", motor[DriveFL], motor[DriveFR], motor[DriveBL], motor[DriveBR]);
                 break;
             case 3:
                 sprintf(lineOne, "%d,%d", robot.leftDrive, robot.rightDrive);
