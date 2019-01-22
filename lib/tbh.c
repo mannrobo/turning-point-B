@@ -106,8 +106,10 @@ void calculateProcessTBH(TBHController & controller) {
     controller.deltaTime = nSysTime - controller.lastTime;
     controller.lastTime = nSysTime;
 
+
     controller.deltaEncoder = SensorValue[controller.encoder] - controller.lastEncoder;
     controller.lastEncoder = SensorValue[controller.encoder];
 
     controller.process = ((float)controller.deltaEncoder / (float)controller.deltaTime) * 1000.0 *  controller.gearRatio / 360.0 * 60.0;
+    
 }
