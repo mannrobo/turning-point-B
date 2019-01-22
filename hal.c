@@ -1,45 +1,49 @@
 /**
- * Hardware Abstraction Layer
- */
+* Hardware Abstraction Layer
+*/
 
 #include "lib\motor.c"
 #include "lib\pid.c"
 #include "lib\tbh.c"
 
 enum motorMode {
-    STOP = 0,
-    FORWARD = 1,
-    REVERSE = 2,
+	STOP = 0,
+	FORWARD = 1,
+	REVERSE = 2,
 };
 
 
 typedef struct {
 
-    // Drive - Motor Values
-    int leftDrive;
-    int rightDrive;
+	// Drive - Motor Values
+	int leftDrive;
+	int rightDrive;
 
-    // Drive PIDs (actually just p-loops but whatever)
-    PIDController driveController;
-    PIDController turnController;
+	// Drive Directional Control
+	int forward;
+	int turn;
 
-    // Flywheel
-    TBHController flywheel;
+	// Drive PIDs (actually just p-loops but whatever)
+	PIDController driveController;
+	PIDController turnController;
 
-    motorMode intake;
-    motorMode uptake;
+	// Flywheel
+	TBHController flywheel;
 
-    // Cap Flipper power
-    int capFlipper;
+	motorMode intake;
+	motorMode indexer;
 
-    // Fire Button -- Robot should fire ball when ready
-    bool firing;
+	// Cap Flipper power
+	int capFlipper;
 
-    // Ball is ready to fire
-    bool ballLoaded;
+	// Fire Button -- Robot should fire ball when ready
+	bool firing;
 
-    // Uptake override
-    motorMode uptakeOverride;
+	// Ball is ready to fire
+	bool ballLoaded;
+
+	// indexer override
+	motorMode indexerOverride;
 
 } HardwareAbstraction;
 
@@ -47,142 +51,136 @@ typedef struct {
 HardwareAbstraction robot;
 
 /**
- * Individual subsystem control
- */
+* Individual subsystem control
+*/
 void controllerStep() {
-    // Arcade Drive
-    int forward = abs(vexRT[Ch3]) > 32 ? vexRT[Ch3] : 0,
-        turn = abs(vexRT[Ch4]) > 40 ? vexRT[Ch4] * 0.7 : 0;
+	// Arcade Drive
+	int forward = abs(vexRT[Ch3]) > 32 ? vexRT[Ch3] : 0,
+	turn = abs(vexRT[Ch4]) > 40 ? vexRT[Ch4] * 0.7 : 0;
 
-    robot.leftDrive = forward + turn;
-    robot.rightDrive = forward - turn;
+	robot.forward = forward;
+	robot.turn = turn;
 
-    // Intake
-    if(vexRT[Btn6U]) {
-        robot.intake = REVERSE;
-    } else if (vexRT[Btn6D]) {
-        robot.intake = FORWARD;
-    }
+	robot.leftDrive = forward + turn;
+	robot.rightDrive = forward - turn;
 
-    // Flywheel
-    if(vexRT[Btn7U]) {
-        targetTBH(robot.flywheel, 2500);
-    } else if(vexRT[Btn7R]) {
-        targetTBH(robot.flywheel, 1800);
-    } else if(vexRT[Btn7D]) {
-        targetTBH(robot.flywheel, 0);
-    }
+	// Intake
+	if(vexRT[Btn6U]) {
+		robot.intake = REVERSE;
+		} else if (vexRT[Btn6D]) {
+		robot.intake = FORWARD;
+	}
 
-    // Manual Flywheel Control
-    if(vexRT[Btn8U] && robot.flywheel.setpoint < robot.flywheel.maxRPM) {
-        targetTBH(robot.flywheel, robot.flywheel.setpoint + 10);
-    } else if (vexRT[Btn8D] && robot.flywheel.setpoint > 0) {
-        targetTBH(robot.flywheel, robot.flywheel.setpoint - 10);
-    }
+	// Flywheel
+	if(vexRT[Btn7U]) {
+		targetTBH(robot.flywheel, 2500);
+		} else if(vexRT[Btn7R]) {
+		targetTBH(robot.flywheel, 1800);
+		} else if(vexRT[Btn7D]) {
+		targetTBH(robot.flywheel, 0);
+	}
 
-    // Fire Control
-    if(vexRT[Btn5U]) {
-        robot.firing = true;
-    } else if(vexRT[Btn5D]) {
-        robot.uptakeOverride = FORWARD;
-    } else {
-        robot.uptakeOverride = STOP;
-    }
+	// Manual Flywheel Control
+	if(vexRT[Btn8U] && robot.flywheel.setpoint < robot.flywheel.maxRPM) {
+		targetTBH(robot.flywheel, robot.flywheel.setpoint + 10);
+		} else if (vexRT[Btn8D] && robot.flywheel.setpoint > 0) {
+		targetTBH(robot.flywheel, robot.flywheel.setpoint - 10);
+	}
 
-    // Cap Flipper
-    if(vexRT[Btn8U]) {
-        robot.capFlipper = -80;
-    } else if(vexRT[Btn8D]) {
-        robot.capFlipper = 80;
-    } else {
-        robot.capFlipper = 0;
-    }
+	// Fire Control
+	if(vexRT[Btn5U]) {
+		robot.firing = true;
+		} else if(vexRT[Btn5D]) {
+		robot.indexerOverride = FORWARD;
+		} else {
+		robot.indexerOverride = STOP;
+	}
+
+	// Cap Flipper
+	if(vexRT[Btn8U]) {
+		robot.capFlipper = -80;
+		} else if(vexRT[Btn8D]) {
+		robot.capFlipper = 80;
+		} else {
+		robot.capFlipper = 0;
+	}
 }
 
 void driveStep() {
-    motorTarget[DriveFL] = robot.leftDrive;
-    motorTarget[DriveBL] = robot.leftDrive;
+    // Note: Back A motors are INTENTIONALLY reversed
+	motorTarget[DriveFL] = robot.leftDrive;
+	motorTarget[DriveBLA] = robot.rightDrive;
+	motorTarget[DriveBLB] = robot.leftDrive;
 
-    motorTarget[DriveFR] = -robot.rightDrive;
-    motorTarget[DriveBR] = -robot.rightDrive;
+	motorTarget[DriveFR] = -robot.rightDrive;
+	motorTarget[DriveBRA] = -robot.leftDrive
+	motorTarget[DriveBRB] = -robot.rightDrive;
 }
 
 void flywheelStep() {
-    // Firing Control
-    robot.ballLoaded = SensorValue[ballDetector] <= 8;
+	// Firing Control
+	robot.ballLoaded = SensorValue[ballDetector] <= 10;
 
-    // If we've fired the ball, reset
-    if(!robot.ballLoaded && robot.firing) {
-        robot.firing = false;
-    // Fire the ball if the conditions are met (loaded, flywheel's right, fire command)
-    } else if(robot.ballLoaded &&
-       robot.firing &&
-       abs(robot.flywheel.error) < 250
-    ) {
-        robot.uptake = REVERSE;
-    // If we're not firing, move the balls into firing position
-    } else if(!robot.ballLoaded && !robot.firing) {
-        robot.uptake = REVERSE;
-        // Stop the firing to prevent accidental shooting
-    } else {
-        robot.uptake = STOP;
-    }
+	// Indexer allows best control of roller
+	if(robot.firing) {
+		robot.indexer = REVERSE;
+		} else {
+		robot.indexer = STOP;
+	}
 
 
-    // Flywheel Itself
-    calculateProcessTBH(robot.flywheel);
-    stepTBH(robot.flywheel);
+	// Flywheel Itself
+	calculateProcessTBH(robot.flywheel);
+	stepTBH(robot.flywheel);
 
-    motorTarget[FlywheelA] = robot.flywheel.output;
-    motorTarget[FlywheelB] = robot.flywheel.output;
+	motorTarget[FlywheelOut] = robot.flywheel.output;
 }
 
 task hardwareAbstractionLayer() {
-    initTBH(robot.flywheel, 0.0015, 3500, flywheel, 5.0);
-    targetTBH(robot.flywheel, 0);
+	initTBH(robot.flywheel, 0.0015, 3500, flywheel, 5.0);
+	targetTBH(robot.flywheel, 0);
 
-    while(true) {
-        if(!bIfiAutonomousMode) {
-           controllerStep();
-        }
-        driveStep();
-        flywheelStep();
+	while(true) {
+		if(!bIfiAutonomousMode) {
+			controllerStep();
+		}
+		driveStep();
+		flywheelStep();
 
-        // Misc.
-        switch(robot.intake) {
-            case FORWARD:
-                motorTarget[Intake] = 127;
-                break;
-            case REVERSE:
-                motorTarget[Intake] = -127;
-                break;
-            case STOP:
-                motorTarget[Intake] = 0;
-                break;
-        }
+		// Misc.
+		switch(robot.intake) {
+		case FORWARD:
+			motorTarget[Intake] = 127;
+			break;
+		case REVERSE:
+			motorTarget[Intake] = -127;
+			break;
+		case STOP:
+			motorTarget[Intake] = 0;
+			break;
+		}
 
-        // Manual override of the uptake (in case of ball getting stuck)
-        if(robot.uptakeOverride != STOP) {
-            robot.uptake = robot.uptakeOverride;
-        }
+		// Manual override of the indexer (in case of ball getting stuck)
+		if(robot.indexerOverride != STOP) {
+			robot.indexer = robot.indexerOverride;
+		}
 
-        switch(robot.uptake) {
-            case FORWARD:
-                motorTarget[Uptake] = 127;
-                break;
-            case REVERSE:
-                motorTarget[Uptake] = -127;
-                break;
-            case STOP:
-                motorTarget[Uptake] = 0;
-                break;
-        }
+		switch(robot.indexer) {
+		case FORWARD:
+			motorTarget[Indexer] = 80;
+			break;
+		case REVERSE:
+			motorTarget[Indexer] = -80;
+			break;
+		case STOP:
+			motorTarget[Indexer] = 0;
+			break;
+		}
 
 
 
-        motorTarget[CapFlipper] = robot.capFlipper;
 
-        motorControlStep();
-        wait1Msec(20);
-    }
+		motorControlStep();
+		wait1Msec(20);
+	}
 }
