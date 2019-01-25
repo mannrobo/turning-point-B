@@ -51,12 +51,12 @@ task lcdDebug() {
                 sprintf(lineOne, "M: %1.2fV", nImmediateBatteryLevel/1000.0);
                 sprintf(lineTwo, "E: %1.2fV B: %1.2fV", SensorValue[powerExpander]/270.0, BackupBatteryLevel/1000.0);
                 break;
-            case 3:
+            case 2:
                 sprintf(lineOne, "%d,%d", robot.leftDrive, robot.rightDrive);
                 sprintf(lineTwo, "%d,%d,%1.1f", SensorValue[leftDrive], SensorValue[rightDrive], absoluteDirection(SensorValue[gyro]));
                 break;
-            case 4:
-                sprintf(lineOne, "INDEXER: %s", robot.ballLoaded ? "BALL" : "NO BALL");
+            case 3:
+                sprintf(lineOne, "IDXR:%s;FRNG:%s", robot.ballLoaded ? "B" : "NB", robot.firing ? "Y" : "N");
                 sprintf(lineTwo, "%d", SensorValue[ballDetector]);
                 break;
             default:
