@@ -91,7 +91,7 @@ void controllerStep() {
 	if(vexRT[Btn5U]) {
 		robot.firing = true;
 		} else if(vexRT[Btn5D]) {
-		robot.indexerOverride = FORWARD;
+		robot.indexerOverride = REVERSE;
 		} else {
 		robot.indexerOverride = STOP;
 	}
@@ -119,15 +119,19 @@ void driveStep() {
 
 void flywheelStep() {
 	// Firing Control
-	robot.ballLoaded = SensorValue[ballDetector] <= 10;
+	robot.ballLoaded = SensorValue[ballDetector] <= 15;
 
-	// Indexer allows best control of roller
-	if(robot.firing) {
-		robot.indexer = REVERSE;
-		} else {
+	// When to fire: if a ball is loaded, the flywheel error is sufficently small, and the flywheel speed is above a threshold 
+	if(robot.ballLoaded && robot.flywheel.error < 100 && robot.flywheel.setpoint > 1000) {
+		robot.indexer = FORWARD;
+	// Hold balls and prepare to fire
+	} else if(robot.ballLoaded) {
 		robot.indexer = STOP;
+	// Otherwise try to catch balls
+	} else {
+		robot.indexer = FORWARD;
+		robot.firing = false;
 	}
-
 
 	// Flywheel Itself
 	calculateProcessTBH(robot.flywheel);
@@ -147,7 +151,25 @@ task hardwareAbstractionLayer() {
 		driveStep();
 		flywheelStep();
 
-		// Misc.
+
+		// Shoot out ball if required
+		if(robot.indexerOverride != STOP) {
+			robot.indexer = robot.indexerOverride;
+			robot.intake = robot.indexerOverride;
+		}
+
+		switch(robot.indexer) {
+		case FORWARD:
+			motorTarget[Indexer] = 70;
+			break;
+		case REVERSE:
+			motorTarget[Indexer] = -70;
+			break;
+		case STOP:
+			motorTarget[Indexer] = 0;
+			break;
+		}
+
 		switch(robot.intake) {
 		case FORWARD:
 			motorTarget[Intake] = 127;
@@ -159,24 +181,6 @@ task hardwareAbstractionLayer() {
 			motorTarget[Intake] = 0;
 			break;
 		}
-
-		// Manual override of the indexer (in case of ball getting stuck)
-		if(robot.indexerOverride != STOP) {
-			robot.indexer = robot.indexerOverride;
-		}
-
-		switch(robot.indexer) {
-		case FORWARD:
-			motorTarget[Indexer] = 80;
-			break;
-		case REVERSE:
-			motorTarget[Indexer] = -80;
-			break;
-		case STOP:
-			motorTarget[Indexer] = 0;
-			break;
-		}
-
 
 
 
