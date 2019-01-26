@@ -56,7 +56,7 @@ task lcdDebug() {
                 sprintf(lineTwo, "%d,%d,%1.1f", SensorValue[leftDrive], SensorValue[rightDrive], absoluteDirection(SensorValue[gyro]));
                 break;
             case 3:
-                sprintf(lineOne, "IDXR:%s;FRNG:%s", robot.ballLoaded ? "B" : "NB", robot.firing ? "Y" : "N");
+                sprintf(lineOne, "IDXR:%s FRNG:%s", robot.ballLoaded ? "B" : "NB", robot.firing ? "Y" : "N");
                 sprintf(lineTwo, "%d", SensorValue[ballDetector]);
                 break;
             default:
