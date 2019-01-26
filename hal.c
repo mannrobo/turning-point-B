@@ -122,7 +122,7 @@ void flywheelStep() {
 	robot.ballLoaded = SensorValue[ballDetector] <= 15;
 
 	// When to fire: if a ball is loaded, the flywheel error is sufficently small, and the flywheel speed is above a threshold 
-	if(robot.ballLoaded && robot.flywheel.error < 100 && robot.flywheel.setpoint > 1000) {
+	if(robot.ballLoaded && robot.flywheel.error < 100 && robot.flywheel.setpoint > 1000 && robot.firing) {
 		robot.indexer = FORWARD;
 	// Hold balls and prepare to fire
 	} else if(robot.ballLoaded) {
