@@ -116,7 +116,7 @@ void turn(int degrees) {
         robot.turnController.value = SensorValue[gyro] / 10.0;
         stepPID(robot.turnController);
 
-        robot.turn = -robot.turnController.output
+        robot.turn = -robot.turnController.output;
     } while(abs(robot.turnController.output) > 20);
 
     robot.turn = 0;
