@@ -170,9 +170,10 @@ void autonOne() {
     drive(400);
 }
 
+// Fire Preload and Center Park
 void autonProgSkills() {
     // Turn on flywheel
-    targetTBH(robot.flywheel, 2500);
+    targetTBH(robot.flywheel, 3200);
     robot.intake = FORWARD;
 
     // Fire preload
@@ -181,35 +182,15 @@ void autonProgSkills() {
     // Turn off flywheel to save power
     targetTBH(robot.flywheel, 0);
 
-    // Score low flag
-    drive(650);
-    wait1Msec(1000);
-
-
-    // Drive back to first cap
-    drive(-300);
-    turn(-90);
-    wallSquare(-1);
-    robot.intake = REVERSE;
-
-    // Flip first cap
-    drive(450);
-    drive(-450);
-
-    // Return to course
-    turn(-90);
-
-
-    // Drive to next cap
+    // Drive to platform
     drive(400);
+    wait1Msec(400);
+
+    // Turn to face platform
     turn(90);
-    wallSquare(-1);
-    robot.intake = FORWARD;
 
-    // Drive to pick up ball
-    drive(600);
-
-
+    // Center park
+    drive(700);
 }
 
 
