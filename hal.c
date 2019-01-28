@@ -43,6 +43,9 @@ typedef struct {
 	// Ball is ready to fire
 	bool ballLoaded;
 
+	// Double shot state (0 = inactive, 1 = before first shot, 2 = before second shot)
+	int doubleShot;
+
 	// indexer override
 	motorMode indexerOverride;
 
@@ -68,9 +71,11 @@ void controllerStep() {
 	robot.rightDrive = forward - turn;
 
 	// Intake
-	if(vexRT[Btn6U]) {
+	if(vexRT[Btn6U] && vexRT[Btn6D]) {
+		robot.intake = STOP;
+	else if(vexRT[Btn6U]) {
 		robot.intake = REVERSE;
-		} else if (vexRT[Btn6D]) {
+	} else if (vexRT[Btn6D]) {
 		robot.intake = FORWARD;
 	}
 
@@ -85,27 +90,34 @@ void controllerStep() {
 
 	// Manual Flywheel Control
 	if(vexRT[Btn8U] && robot.flywheel.setpoint < robot.flywheel.maxRPM) {
-		targetTBH(robot.flywheel, robot.flywheel.setpoint + 10);
-		} else if (vexRT[Btn8D] && robot.flywheel.setpoint > 0) {
-		targetTBH(robot.flywheel, robot.flywheel.setpoint - 10);
+		robot.flywheel.setpoint += 10;
+	} else if (vexRT[Btn8D] && robot.flywheel.setpoint > 0) {
+		robot.flywheel.setpoint -= 10;
 	}
 
 	// Fire Control
 	if(vexRT[Btn5U]) {
 		robot.firing = true;
-		} else if(vexRT[Btn5D]) {
+	} else if(vexRT[Btn5D]) {
 		robot.indexerOverride = REVERSE;
-		} else {
+	} else {
 		robot.indexerOverride = STOP;
 	}
 
-	// Cap Flipper
-	if(vexRT[Btn8U]) {
-		robot.capFlipper = -80;
-		} else if(vexRT[Btn8D]) {
-		robot.capFlipper = 80;
-		} else {
-		robot.capFlipper = 0;
+	// Double shot
+	if (robot.doubleShot == 1 && robot.ballLoaded) {
+		// Pre-first shot
+		targetTBH(robot.flywheel, 3200);
+		robot.firing = true;
+	} else if (robot.doubleShot == 1) {
+		// Shot first ball
+		targetTBH(robot.flywheel, 2500);
+		robot.firing = true;
+		robot.doubleShot = 2;
+	} else if(robot.doubleShot == 2 && !robot.ballLoaded) {
+		// Shot ball
+		robot.firing = false;
+		robot.doubleShot = 0;
 	}
 }
 
