@@ -5,6 +5,7 @@
 #include "lib\motor.c"
 #include "lib\pid.c"
 #include "lib\tbh.c"
+#include "lib\util.c"
 
 enum motorMode {
 	STOP = 0,
@@ -55,11 +56,13 @@ HardwareAbstraction robot;
 */
 void controllerStep() {
 	// Arcade Drive
-	int forward = abs(vexRT[Ch3]) > 32 ? vexRT[Ch3] : 0,
-	turn = abs(vexRT[Ch4]) > 40 ? vexRT[Ch4] * 0.7 : 0;
+	int forward = logistic(vexRT[Ch3]),
+		turn = logistic(vexRT[Ch4]);
+
 
 	robot.forward = forward;
 	robot.turn = turn;
+
 
 	robot.leftDrive = forward + turn;
 	robot.rightDrive = forward - turn;
@@ -113,7 +116,7 @@ void driveStep() {
 	motorTarget[DriveBLB] = robot.leftDrive;
 
 	motorTarget[DriveFR] = -robot.rightDrive;
-	motorTarget[DriveBRA] = -robot.leftDrive
+	motorTarget[DriveBRA] = -robot.leftDrive;
 	motorTarget[DriveBRB] = -robot.rightDrive;
 }
 
@@ -121,7 +124,7 @@ void flywheelStep() {
 	// Firing Control
 	robot.ballLoaded = SensorValue[ballDetector] <= 15;
 
-	// When to fire: if a ball is loaded, the flywheel error is sufficently small, and the flywheel speed is above a threshold 
+	// When to fire: if a ball is loaded, the flywheel error is sufficently small, and the flywheel speed is above a threshold
 	if(robot.ballLoaded && robot.flywheel.error < 100 && robot.flywheel.setpoint > 1000 && robot.firing) {
 		robot.indexer = FORWARD;
 	// Hold balls and prepare to fire
