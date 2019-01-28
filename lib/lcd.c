@@ -40,11 +40,9 @@ task lcdDebug() {
 
         switch(lcdDebugSlot) {
 
-
             // Normal access displays
-
             case 0:
-                sprintf(lineOne, "%d", motor[FlywheelOut]);
+                sprintf(lineOne, "%d (%s)", motor[FlywheelOut], abs(robot.flywheel.error) < 100 ? "STABLE" : "UNSTABLE" );
                 sprintf(lineTwo, "%1.2f-%1.2f", robot.flywheel.setpoint, robot.flywheel.process);
                 break;
             case 1:
