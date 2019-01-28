@@ -52,7 +52,7 @@ task lcdDebug() {
                 sprintf(lineTwo, "E: %1.2fV B: %1.2fV", SensorValue[powerExpander]/270.0, BackupBatteryLevel/1000.0);
                 break;
             case 2:
-                sprintf(lineOne, "%d,%d", robot.leftDrive, robot.rightDrive);
+                sprintf(lineOne, "%d,%d (%d+%d)", robot.leftDrive, robot.rightDrive, robot.forward,robot.turn);
                 sprintf(lineTwo, "%d,%d,%1.1f", SensorValue[leftDrive], SensorValue[rightDrive], absoluteDirection(SensorValue[gyro]));
                 break;
             case 3:
