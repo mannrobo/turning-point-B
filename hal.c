@@ -82,9 +82,9 @@ void controllerStep() {
 	// Flywheel
 	if(vexRT[Btn7U]) {
 		targetTBH(robot.flywheel, 2500);
-		} else if(vexRT[Btn7R]) {
+	} else if(vexRT[Btn7R]) {
 		targetTBH(robot.flywheel, 1800);
-		} else if(vexRT[Btn7D]) {
+	} else if(vexRT[Btn7D]) {
 		targetTBH(robot.flywheel, 0);
 	}
 
@@ -174,27 +174,27 @@ task hardwareAbstractionLayer() {
 		}
 
 		switch(robot.indexer) {
-		case FORWARD:
-			motorTarget[Indexer] = 70;
-			break;
-		case REVERSE:
-			motorTarget[Indexer] = -70;
-			break;
-		case STOP:
-			motorTarget[Indexer] = 0;
-			break;
+			case FORWARD:
+				motorTarget[Indexer] = 70;
+				break;
+			case REVERSE:
+				motorTarget[Indexer] = -70;
+				break;
+			case STOP:
+				motorTarget[Indexer] = 0;
+				break;
 		}
 
 		switch(robot.intake) {
-		case FORWARD:
-			motorTarget[Intake] = 127;
-			break;
-		case REVERSE:
-			motorTarget[Intake] = -127;
-			break;
-		case STOP:
-			motorTarget[Intake] = 0;
-			break;
+			case FORWARD:
+				motorTarget[Intake] = 127;
+				break;
+			case REVERSE:
+				motorTarget[Intake] = -127;
+				break;
+			case STOP:
+				motorTarget[Intake] = 0;
+				break;
 		}
 
 
