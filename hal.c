@@ -96,6 +96,27 @@ void flywheelStep() {
 		robot.doubleShot = 0;
 	}
 
+	// Firing Control
+	robot.ballLoaded = SensorValue[ballDetector] <= 15;
+
+	// When to fire: if a ball is loaded, the flywheel error is sufficently small, and the flywheel speed is above a threshold
+	if(robot.ballLoaded && robot.flywheel.error < 100 && robot.flywheel.setpoint > 1000 && robot.firing) {
+		robot.indexer = FORWARD;
+	// Hold balls and prepare to fire
+	} else if(robot.ballLoaded) {
+		robot.indexer = STOP;
+	// Otherwise try to catch balls
+	} else {
+		robot.indexer = FORWARD;
+		robot.firing = false;
+	}
+
+	// Flywheel Itself
+	calculateProcessTBH(robot.flywheel);
+	stepTBH(robot.flywheel);
+
+	motorTarget[FlywheelOut] = robot.flywheel.output;
+
 
 
 }
@@ -123,28 +144,6 @@ void driveStep() {
 	motorTarget[DriveBRB] = -robot.rightDrive;
 }
 
-void flywheelStep() {
-	// Firing Control
-	robot.ballLoaded = SensorValue[ballDetector] <= 15;
-
-	// When to fire: if a ball is loaded, the flywheel error is sufficently small, and the flywheel speed is above a threshold
-	if(robot.ballLoaded && robot.flywheel.error < 100 && robot.flywheel.setpoint > 1000 && robot.firing) {
-		robot.indexer = FORWARD;
-	// Hold balls and prepare to fire
-	} else if(robot.ballLoaded) {
-		robot.indexer = STOP;
-	// Otherwise try to catch balls
-	} else {
-		robot.indexer = FORWARD;
-		robot.firing = false;
-	}
-
-	// Flywheel Itself
-	calculateProcessTBH(robot.flywheel);
-	stepTBH(robot.flywheel);
-
-	motorTarget[FlywheelOut] = robot.flywheel.output;
-}
 
 void takerStep() {
 
