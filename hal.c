@@ -10,7 +10,7 @@
 enum motorMode {
 	STOP = 0,
 	FORWARD = 1,
-	REVERSE = 2,
+	REVERSE = 2
 };
 
 
@@ -54,32 +54,8 @@ typedef struct {
 
 HardwareAbstraction robot;
 
-/**
-* Individual subsystem control
-*/
-void controllerStep() {
-	// Arcade Drive
-	int forward = logistic(vexRT[Ch3]),
-		turn = logistic(vexRT[Ch4]);
-
-
-	robot.forward = forward;
-	robot.turn = turn;
-
-
-	robot.leftDrive = forward + turn;
-	robot.rightDrive = forward - turn;
-
-	// Intake
-	if(vexRT[Btn6U] && vexRT[Btn6D]) {
-		robot.intake = STOP;
-	else if(vexRT[Btn6U]) {
-		robot.intake = REVERSE;
-	} else if (vexRT[Btn6D]) {
-		robot.intake = FORWARD;
-	}
-
-	// Flywheel
+void flywheelStep() {
+	// Targeting
 	if(vexRT[Btn7U]) {
 		targetTBH(robot.flywheel, 2500);
 	} else if(vexRT[Btn7R]) {
@@ -88,14 +64,14 @@ void controllerStep() {
 		targetTBH(robot.flywheel, 0);
 	}
 
-	// Manual Flywheel Control
+	// Manual adjust
 	if(vexRT[Btn8U] && robot.flywheel.setpoint < robot.flywheel.maxRPM) {
 		robot.flywheel.setpoint += 10;
 	} else if (vexRT[Btn8D] && robot.flywheel.setpoint > 0) {
 		robot.flywheel.setpoint -= 10;
 	}
 
-	// Fire Control
+	// Double Shot
 	if(vexRT[Btn5U]) {
 		robot.firing = true;
 	} else if(vexRT[Btn5D]) {
@@ -119,9 +95,24 @@ void controllerStep() {
 		robot.firing = false;
 		robot.doubleShot = 0;
 	}
+
+
+
 }
 
 void driveStep() {
+	// Arcade Drive
+	int forward = logistic(vexRT[Ch3]),
+		turn = logistic(vexRT[Ch4]);
+
+
+	robot.forward = forward;
+	robot.turn = turn;
+
+
+	robot.leftDrive = forward + turn;
+	robot.rightDrive = forward - turn;
+
     // Note: Back A motors are INTENTIONALLY reversed
 	motorTarget[DriveFL] = robot.leftDrive;
 	motorTarget[DriveBLA] = robot.rightDrive;
@@ -155,50 +146,55 @@ void flywheelStep() {
 	motorTarget[FlywheelOut] = robot.flywheel.output;
 }
 
+void takerStep() {
+
+	if(vexRT[Btn6U] && vexRT[Btn6D]) {
+		robot.intake = STOP;
+	} else if(vexRT[Btn6U]) {
+		robot.intake = REVERSE;
+	} else if (vexRT[Btn6D]) {
+		robot.intake = FORWARD;
+	}
+
+	// Shoot out ball if required
+	if(robot.indexerOverride != STOP) {
+		robot.indexer = robot.indexerOverride;
+		robot.intake = robot.indexerOverride;
+	}
+
+	switch(robot.indexer) {
+		case FORWARD:
+			motorTarget[Indexer] = 70;
+			break;
+		case REVERSE:
+			motorTarget[Indexer] = -70;
+			break;
+		case STOP:
+			motorTarget[Indexer] = 0;
+			break;
+	}
+
+	switch(robot.intake) {
+		case FORWARD:
+			motorTarget[Intake] = 127;
+			break;
+		case REVERSE:
+			motorTarget[Intake] = -127;
+			break;
+		case STOP:
+			motorTarget[Intake] = 0;
+			break;
+	}
+}
+
 task hardwareAbstractionLayer() {
 	initTBH(robot.flywheel, 0.0015, 3500, flywheel, 5.0);
 	targetTBH(robot.flywheel, 0);
 
 	while(true) {
-		if(!bIfiAutonomousMode) {
-			controllerStep();
-		}
 		driveStep();
 		flywheelStep();
-
-
-		// Shoot out ball if required
-		if(robot.indexerOverride != STOP) {
-			robot.indexer = robot.indexerOverride;
-			robot.intake = robot.indexerOverride;
-		}
-
-		switch(robot.indexer) {
-			case FORWARD:
-				motorTarget[Indexer] = 70;
-				break;
-			case REVERSE:
-				motorTarget[Indexer] = -70;
-				break;
-			case STOP:
-				motorTarget[Indexer] = 0;
-				break;
-		}
-
-		switch(robot.intake) {
-			case FORWARD:
-				motorTarget[Intake] = 127;
-				break;
-			case REVERSE:
-				motorTarget[Intake] = -127;
-				break;
-			case STOP:
-				motorTarget[Intake] = 0;
-				break;
-		}
-
-
-
+		takerStep();
 		motorControlStep();
 		wait1Msec(20);
 	}
