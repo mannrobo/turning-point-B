@@ -71,7 +71,7 @@ void flywheelStep() {
 		robot.flywheel.setpoint -= 10;
 	}
 
-	// Double Shot
+	// Firing Control
 	if(vexRT[Btn5U]) {
 		robot.firing = true;
 	} else if(vexRT[Btn5D]) {
