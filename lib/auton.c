@@ -173,7 +173,7 @@ void autonOne() {
 // Fire Preload and Center Park
 void autonProgSkills() {
     // Turn on flywheel
-    targetTBH(robot.flywheel, 3200);
+    targetTBH(robot.flywheel, 2500);
     robot.intake = FORWARD;
 
     // Fire preload
@@ -182,15 +182,12 @@ void autonProgSkills() {
     // Turn off flywheel to save power
     targetTBH(robot.flywheel, 0);
 
-    // Drive to platform
+    // Drive to park 
     drive(400);
     wait1Msec(400);
 
-    // Turn to face platform
-    turn(90);
-
-    // Center park
-    drive(700);
+    // Drive Back
+    drive(-200);
 }
 
 
