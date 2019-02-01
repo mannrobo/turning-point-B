@@ -116,10 +116,15 @@ void turn(int degrees) {
         robot.turnController.value = SensorValue[gyro] / 10.0;
         stepPID(robot.turnController);
 
-        robot.turn = -robot.turnController.output;
+        robot.leftDrive = -robot.turnController.output;
+        robot.rightDrive = robot.turnController.output;
     } while(abs(robot.turnController.output) > 20);
 
-    robot.turn = 0;
+    robot.leftDrive  = 50 * sgn(degrees);
+    robot.rightDrive = -50 * sgn(degrees);
+    wait1Msec(100);
+    robot.leftDrive = 0;
+    robot.rightDrive = 0;
 }
 
 void fire() {
@@ -142,30 +147,68 @@ void wallSquare(int direction) {
  * Routines!
  */
 
-// Routine 1: Closest to flag
 
-void autonOne() {
-    // Turn on Flywheel and start intake
-    targetTBH(robot.flywheel, 3200);
-    robot.intake = FORWARD;
+// Backfield Auton
+void autonBackfield() {
+    // Turn on flywheel
+    targetTBH(robot.flywheel, 2000);
 
-    writeDebugStreamLine("forward");
-    drive(600);
-    writeDebugStreamLine("back");
-    drive(-500);
+    wait1Msec(500s);
 
-    writeDebugStreamLine("turn");
+    // Fire preload
+    fire();
 
-    if(match.alliance == ALLIANCE_BLUE) {
+    wait1Msec(700);
+
+
+    // Turn off flywheel to save power
+    targetTBH(robot.flywheel, 0);
+    wait1Msec(1000);
+
+    // Drive to park
+    driveMax(700);
+    wait1Msec(400);
+
+
+    if(match.alliance == ALLIANCE_RED) {
         turn(-90);
     } else {
         turn(90);
     }
 
-    writeDebugStreamLine("fire");
-
-    fire();
+    robot.leftDrive = -80;
+    robot.rightDrive = -80;
     wait1Msec(200);
+    robot.leftDrive = 0;
+    robot.rightDrive = 0;
+
+    wait1Msec(1000);
+
+    driveMax(1400)
+}
+
+void autonFrontfield() {
+    targetTBH(robot.flywheel, 2500);
+    
+    robot.intake = REVERSE;
+    
+    // Score low flag
+    drive(400);
+    wait1Msec(400);
+    drive(-100);
+
+    // Shoot at middle flag
+    fire();
+
+    wait1Msec(500);
+    drive(-100);
+
+    // Score closest cap
+    if(match.alliance == ALLIANCE_RED) {
+        turn(-90);
+    } else {
+        turn(90);
+    }
 
     drive(400);
 }
@@ -173,22 +216,36 @@ void autonOne() {
 // Fire Preload and Center Park
 void autonProgSkills() {
     // Turn on flywheel
-    targetTBH(robot.flywheel, 2500);
-    robot.intake = FORWARD;
+    targetTBH(robot.flywheel, 2000);
+
+    wait1Msec(2000);
 
     // Fire preload
     fire();
 
+
     // Turn off flywheel to save power
     targetTBH(robot.flywheel, 0);
+    wait1Msec(1000);
 
-    // Drive to park 
-    drive(400);
+    // Drive to park
+    driveMax(500);
     wait1Msec(400);
 
-    // Drive Back
-    drive(-200);
+    turn(-90);
+
+    robot.leftDrive = -80;
+    robot.rightDrive = -80;
+    wait1Msec(200);
+    robot.leftDrive = 0;
+    robot.rightDrive = 0;
+
+    wait1Msec(1000);
+
+    driveMax(2000)
+
 }
+
 
 
 void autonTestFlywheel() {
@@ -199,12 +256,3 @@ void autonTestFlywheel() {
     }
 }
 
-void autonSquareDance() {
-    turn(95);
-    drive(300);
-}
-
-
-void autonTestDrive() {
-    drive(1000);
-}
