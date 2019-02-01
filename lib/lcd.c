@@ -176,10 +176,10 @@ void lcdStartup() {
 
     wait1Msec(1000);
 
-    string autons[] = {"Match #1", "Prog Skill"};
+    string autons[] = {"Front", "Back", "Prog Skills"};
 
     displayLCDCenteredString(0, "Auton");
-    match.auton = lcdMenu(1, autons, 2);
+    match.auton = lcdMenu(1, autons, 3);
 
     lcdClear();
 }
