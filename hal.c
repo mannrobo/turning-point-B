@@ -123,16 +123,18 @@ void flywheelStep() {
 
 void driveStep() {
 	// Arcade Drive
-	int forward = logistic(vexRT[Ch3]),
-		turn = logistic(vexRT[Ch4]);
+	if(!bIfiAutonomousMode) {
+		int forward = logistic(vexRT[Ch3]),
+			turn = logistic(vexRT[Ch4]);
 
 
-	robot.forward = forward;
-	robot.turn = turn;
+		robot.forward = forward;
+		robot.turn = turn;
 
 
-	robot.leftDrive = forward + turn;
-	robot.rightDrive = forward - turn;
+		robot.leftDrive = forward + turn;
+		robot.rightDrive = forward - turn;
+	}
 
     // Note: Back A motors are INTENTIONALLY reversed
 	motorTarget[DriveFL] = robot.leftDrive;
