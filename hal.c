@@ -59,7 +59,7 @@ void flywheelStep() {
 	if(vexRT[Btn7U]) {
 		targetTBH(robot.flywheel, 2500);
 	} else if(vexRT[Btn7R]) {
-		targetTBH(robot.flywheel, 1800);
+		targetTBH(robot.flywheel, 2400);
 	} else if(vexRT[Btn7D]) {
 		targetTBH(robot.flywheel, 0);
 	}
