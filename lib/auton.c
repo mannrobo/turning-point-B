@@ -153,7 +153,7 @@ void autonBackfield() {
     // Turn on flywheel
     targetTBH(robot.flywheel, 2000);
 
-    wait1Msec(500s);
+    wait1Msec(500);
 
     // Fire preload
     fire();
@@ -189,9 +189,9 @@ void autonBackfield() {
 
 void autonFrontfield() {
     targetTBH(robot.flywheel, 2500);
-    
+
     robot.intake = REVERSE;
-    
+
     // Score low flag
     drive(400);
     wait1Msec(400);
@@ -255,4 +255,3 @@ void autonTestFlywheel() {
         fire();
     }
 }
-
