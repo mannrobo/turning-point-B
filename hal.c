@@ -97,11 +97,6 @@ void flywheelStep() {
 		robot.firing = false;
 	}
 
-	// Double Shot "Control"
-	if(vexRT[Btn8L]) {
-		robot.indexer = FORWARD
-	} 
-
 
 	// Flywheel Itself
 	calculateProcessTBH(robot.flywheel);
