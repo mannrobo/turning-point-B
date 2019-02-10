@@ -257,14 +257,23 @@ void autonTestFlywheel() {
 }
 
 void autonDoubleShot()  {
-    targetTBH(robot.flywheel);
-    robot.intake = FORWARD;
+    targetTBH(robot.flywheel, 2500);
+    robot.intake = REVERSE;
+
+    writeDebugStreamLine("Fire!")
 
     fire();
+
+    writeDebugStreamLine("Cutting Power!")
 
     // Cut power to flywheel
     targetTBH(robot.flywheel, 0);
 
-    // Fire second shot
-    robot.indexerOverride = FORWARD
+    while(robot.flywheel.process > 2000) {
+        wait1Msec(20);
+    }
+
+    writeDebugStreamLine("Fire Again!")
+
+    robot.indexerOverride = FORWARD;
 }

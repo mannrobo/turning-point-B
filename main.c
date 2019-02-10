@@ -79,6 +79,8 @@ task autonomous() {
       break;
     case 2:
       autonProgSkills();
+    case 3:
+      autonDoubleShot();
   }
 }
 
