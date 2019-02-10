@@ -42,20 +42,24 @@ task lcdDebug() {
 
             // Normal access displays
             case 0:
-                sprintf(lineOne, "%d (%s)", motor[FlywheelOut], abs(robot.flywheel.error) < 100 ? "STABLE" : "UNSTABLE" );
+                sprintf(lineOne, "%d (%s)", motor[FlywheelOut], abs(robot.flywheel.error) < 200 ? "STABLE" : "UNSTABLE" );
                 sprintf(lineTwo, "%1.2f-%1.2f", robot.flywheel.setpoint, robot.flywheel.process);
                 break;
             case 1:
+                sprintf(lineOne, "%d => %d", robot.flywheel.error, robot.flywheel.output);
+                sprintf(lineTwo, "%d", robot.flywheel.tbh);
+                break;
+            case 2:
+                sprintf(lineOne, "IDXR:%s FRNG:%s", robot.ballLoaded ? "B" : "NB", robot.firing ? "Y" : "N");
+                sprintf(lineTwo, "%d", SensorValue[ballDetector]);
+                break;
+            case 3:
                 sprintf(lineOne, "M: %1.2fV", nImmediateBatteryLevel/1000.0);
                 sprintf(lineTwo, "E: %1.2fV B: %1.2fV", SensorValue[powerExpander]/270.0, BackupBatteryLevel/1000.0);
                 break;
-            case 2:
+            case 4:
                 sprintf(lineOne, "%d,%d (%d+%d)", robot.leftDrive, robot.rightDrive, robot.forward,robot.turn);
                 sprintf(lineTwo, "%d,%d,%1.1f", SensorValue[leftDrive], SensorValue[rightDrive], absoluteDirection(SensorValue[gyro]));
-                break;
-            case 3:
-                sprintf(lineOne, "IDXR:%s FRNG:%s", robot.ballLoaded ? "B" : "NB", robot.firing ? "Y" : "N");
-                sprintf(lineTwo, "%d", SensorValue[ballDetector]);
                 break;
             default:
                 sprintf(lineOne, "LCD DEBUG SYSTEM");
