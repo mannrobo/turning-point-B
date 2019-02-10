@@ -255,3 +255,16 @@ void autonTestFlywheel() {
         fire();
     }
 }
+
+void autonDoubleShot()  {
+    targetTBH(robot.flywheel);
+    robot.intake = FORWARD;
+
+    fire();
+
+    // Cut power to flywheel
+    targetTBH(robot.flywheel, 0);
+
+    // Fire second shot
+    robot.indexerOverride = FORWARD
+}
