@@ -43,8 +43,7 @@ typedef struct {
 	// Ball is ready to fire
 	bool ballLoaded;
 
-	// Double shot state (0 = inactive, 1 = before first shot, 2 = before second shot)
-	int doubleShot;
+	bool doubleShotActive;
 
 	// indexer override
 	motorMode indexerOverride;
@@ -75,29 +74,16 @@ void flywheelStep() {
 	if(vexRT[Btn5U]) {
 		robot.firing = true;
 	} else if(vexRT[Btn5D]) {
-		robot.indexerOverride = REVERSE;
+		robot.indexerOverride = FORWARD;
 	} else {
 		robot.indexerOverride = STOP;
 	}
 
-	// Double shot
-	if (robot.doubleShot == 1 && robot.ballLoaded) {
-		// Pre-first shot
-		targetTBH(robot.flywheel, 3200);
-		robot.firing = true;
-	} else if (robot.doubleShot == 1) {
-		// Shot first ball
-		targetTBH(robot.flywheel, 2500);
-		robot.firing = true;
-		robot.doubleShot = 2;
-	} else if(robot.doubleShot == 2 && !robot.ballLoaded) {
-		// Shot ball
-		robot.firing = false;
-		robot.doubleShot = 0;
-	}
 
-	// Firing Control
-	robot.ballLoaded = SensorValue[ballDetector] <= 15;
+
+	// Detect Balls for Firing Control
+	robot.ballLoaded = SensorValue[ballDetector] <= 10;
+
 
 	// When to fire: if a ball is loaded, the flywheel error is sufficently small, and the flywheel speed is above a threshold
 	if(robot.ballLoaded && robot.flywheel.error < 100 && robot.flywheel.setpoint > 1000 && robot.firing) {
@@ -110,6 +96,12 @@ void flywheelStep() {
 		robot.indexer = FORWARD;
 		robot.firing = false;
 	}
+
+	// Double Shot "Control"
+	if(vexRT[Btn8L]) {
+		robot.indexer = FORWARD
+	} 
+
 
 	// Flywheel Itself
 	calculateProcessTBH(robot.flywheel);
@@ -151,7 +143,7 @@ void takerStep() {
 
 	if(vexRT[Btn6U] && vexRT[Btn6D]) {
 		robot.intake = STOP;
-	} else if(vexRT[Btn6U]) {
+	} else if(vexRT[Btn6U])  {
 		robot.intake = REVERSE;
 	} else if (vexRT[Btn6D]) {
 		robot.intake = FORWARD;
