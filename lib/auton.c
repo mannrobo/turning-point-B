@@ -153,6 +153,15 @@ void fireAtRPM(int rpm) {
 
 }
 
+// Fires two shots at two rpms
+void doubleShot(int first, int second) {
+    targetTBH(robot.flywheel, first);
+    fire();
+    targetTBH(robot.flywheel, 0);
+    fireAtRPM(second);
+}
+
+
 void wallSquare(int direction) {
     robot.leftDrive = 80 * direction;
     robot.rightDrive = 80 * direction;
@@ -276,17 +285,5 @@ void autonTestFlywheel() {
 }
 
 void autonDoubleShot()  {
-    targetTBH(robot.flywheel, 2500);
-    robot.intake = REVERSE;
-
-    writeDebugStreamLine("Fire!")
-
-    fire();
-
-    writeDebugStreamLine("Cutting Power!")
-
-    // Cut power to flywheel
-    targetTBH(robot.flywheel, 0);
-
-    fireAtRPM(1800)
+    doubleShot(2500, 2000)
 }
