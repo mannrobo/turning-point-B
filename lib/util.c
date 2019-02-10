@@ -29,6 +29,15 @@ float clamp(float val, float min, float max) {
 }
 
 /**
+ * Clamps a value to one value of either sign
+ * @param int value Value to clamp
+ * @param int max The absolute magnitude of the value (direction ambivelant)
+ */
+float clampAbs(int val, int max) {
+  return abs(val) > abs(max) ? max * sgn(val) : val
+}
+
+/**
  * Corrects a single direction encoder, giving it the corrected value, based on the specified associated motor
  * @param int lastValue The last returned value of this function
  * @param int measuredValue The new measured value of the sensor
