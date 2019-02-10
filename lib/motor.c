@@ -2,6 +2,8 @@
  * motor.c - Improved motor control including slew rate, truespeed, deadband, and motor groups. Includes PID control for motors as well
  */
 
+#pragma systemFile
+
 #include "util.c"
 
 // Stores motor targets, use this instead of motor[]
