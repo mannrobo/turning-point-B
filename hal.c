@@ -43,8 +43,6 @@ typedef struct {
 	// Ball is ready to fire
 	bool ballLoaded;
 
-	bool doubleShotActive;
-
 	// indexer override
 	motorMode indexerOverride;
 
@@ -75,7 +73,7 @@ void flywheelStep() {
 		robot.firing = true;
 	} else if(vexRT[Btn5D]) {
 		robot.indexerOverride = FORWARD;
-	} else {
+	} else if(!bIfiAutonomousMode) {
 		robot.indexerOverride = STOP;
 	}
 
@@ -149,6 +147,7 @@ void takerStep() {
 		robot.indexer = robot.indexerOverride;
 		robot.intake = robot.indexerOverride;
 	}
+
 
 	switch(robot.indexer) {
 		case FORWARD:

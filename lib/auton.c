@@ -134,6 +134,25 @@ void fire() {
     }
 }
 
+// Used for doubleshot
+void fireAtRPM(int rpm) {
+    // Wait for correct RPM
+    while(robot.flywheel.process > rpm) {
+        motorTarget[Indexer] = 0;
+        wait1Msec(20);
+    }
+
+    // Actually fire
+    while(robot.ballLoaded) {
+        writeDebugStreamLine("indexerOverride = %d", robot.indexerOverride)
+        robot.indexerOverride = FORWARD;
+        wait1Msec(20);
+    }
+
+    robot.indexerOverride = STOP;
+
+}
+
 void wallSquare(int direction) {
     robot.leftDrive = 80 * direction;
     robot.rightDrive = 80 * direction;
@@ -269,11 +288,5 @@ void autonDoubleShot()  {
     // Cut power to flywheel
     targetTBH(robot.flywheel, 0);
 
-    while(robot.flywheel.process > 2000) {
-        wait1Msec(20);
-    }
-
-    writeDebugStreamLine("Fire Again!")
-
-    robot.indexerOverride = FORWARD;
+    fireAtRPM(1800)
 }
