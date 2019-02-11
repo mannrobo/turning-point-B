@@ -43,6 +43,9 @@ typedef struct {
 	// Ball is ready to fire
 	bool ballLoaded;
 
+	// Double Shot (0 = inactive, 1 = before first shot, 2 = before second shot)
+	int doubleShotMode;
+
 	// indexer override
 	motorMode indexerOverride;
 
@@ -71,16 +74,40 @@ void flywheelStep() {
 	// Firing Control
 	if(vexRT[Btn5U]) {
 		robot.firing = true;
-	} else if(vexRT[Btn5D]) {
-		robot.indexerOverride = FORWARD;
-	} else if(!bIfiAutonomousMode) {
-		robot.indexerOverride = STOP;
 	}
 
 
 
 	// Detect Balls for Firing Control
 	robot.ballLoaded = SensorValue[ballDetector] <= 10;
+
+	// Double Shot: Activate
+	if (vexRT[Btn5D] && robot.doubleShotMode == 0 && robot.ballLoaded) {
+		targetTBH(robot.flywheel, 2500);
+		robot.firing = true;
+		robot.doubleShotMode++;
+	}
+
+	// Double Shot: Fired First Shot
+	if (robot.doubleShotMode == 1 && !robot.ballLoaded) {
+		targetTBH(robot.flywheel, 0);
+		robot.doubleShotMode++;
+	}
+
+	// Double Shot: Fire Second Ball
+	if(robot.doubleShotMode == 2 && robot.flywheel.process < 2000) {
+		robot.indexerOverride = FORWARD;
+		robot.doubleShotMode++;
+	}
+	
+	// Double Shot: Reset
+	if(robot.doubleShotMode == 3 && !robot.ballLoaded && robot.flywheel.process > 2000) {
+		targetTBH(robot.flywheel, 2500);
+		robot.indexerOverride = STOP;
+		robot.intake = STOP;
+		robot.doubleShotMode = 0;		
+	}
+
 
 
 	// When to fire: if a ball is loaded, the flywheel error is sufficently small, and the flywheel speed is above a threshold
@@ -145,7 +172,6 @@ void takerStep() {
 	// Shoot out ball if required
 	if(robot.indexerOverride != STOP) {
 		robot.indexer = robot.indexerOverride;
-		robot.intake = robot.indexerOverride;
 	}
 
 
