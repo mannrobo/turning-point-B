@@ -25,7 +25,7 @@ void lcdDisplayDebug(int slot) {
  * connected, then it will only allow prompts to go when the robot is disabled
  **/
 bool lcdUIOkay() {
-    return nVexRCReceiveState & vrCompetitionSwitch ? bIfiRobotDisabled : true;
+    return bIfiRobotDisabled;
 }
 
 
