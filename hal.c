@@ -95,13 +95,13 @@ void flywheelStep() {
 	}
 
 	// Double Shot: Fire Second Ball
-	if(robot.doubleShotMode == 2 && robot.flywheel.process < 2000) {
+	if(robot.doubleShotMode == 2 && robot.flywheel.process < 2300) {
 		robot.indexerOverride = FORWARD;
 		robot.doubleShotMode++;
 	}
 	
 	// Double Shot: Reset
-	if(robot.doubleShotMode == 3 && !robot.ballLoaded && robot.flywheel.process > 2000) {
+	if(robot.doubleShotMode == 3 && !robot.ballLoaded && robot.flywheel.process > 2300) {
 		targetTBH(robot.flywheel, 2500);
 		robot.indexerOverride = STOP;
 		robot.intake = STOP;
