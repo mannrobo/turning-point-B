@@ -215,7 +215,7 @@ void autonBackfield() {
     driveMax(1400)
 }
 
-void autonFrontfield() {
+void autonFrontfieldOld() {
     targetTBH(robot.flywheel, 2500);
 
     robot.intake = REVERSE;
@@ -239,6 +239,48 @@ void autonFrontfield() {
     }
 
     drive(400);
+}
+
+void autonFrontfield() {
+    // Target flywheel early so we don't have to waste time waiit for it to spin up
+    targetTBH(robot.flywheel, 2500);
+
+    // Om nom nom balls (intake mode)
+    robot.intake = REVERSE;
+
+    // Grab low ball in front of you, scoring cap
+    drive(600);
+    drive(-700);
+
+    wait1Msec(200);
+
+    // Turn to face tree of flags
+    if(match.alliance == ALLIANCE_RED) {
+        turn(90);
+    } else {
+        turn(-90);
+    }
+
+    // First first shot
+    fire();
+
+    wait1Msec(300);
+
+    if(match.alliance == ALLIANCE_RED) {
+        turn(30);
+    } else {
+        turn(-30);
+    }
+
+    // // Score ground flag
+    drive(800);
+    wait1Msec(300);
+
+    // // Second shot
+    // drive(-350)
+    // fire();
+
+
 }
 
 // Fire Preload and Center Park
