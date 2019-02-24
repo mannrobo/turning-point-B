@@ -134,31 +134,23 @@ void fire() {
     }
 }
 
-// Used for doubleshot
-void fireAtRPM(int rpm) {
-    // Wait for correct RPM
-    while(robot.flywheel.process > rpm) {
-        motorTarget[Indexer] = 0;
-        wait1Msec(20);
-    }
-
-    // Actually fire
-    while(robot.ballLoaded) {
-        writeDebugStreamLine("indexerOverride = %d", robot.indexerOverride)
-        robot.indexerOverride = FORWARD;
-        wait1Msec(20);
-    }
-
-    robot.indexerOverride = STOP;
-
-}
 
 // Fires two shots at two rpms
 void doubleShot(int first, int second) {
     targetTBH(robot.flywheel, first);
+    robot.intake = REVERSE;
+    
     fire();
-    targetTBH(robot.flywheel, 0);
-    fireAtRPM(second);
+    
+    targetTBH(robot.flywheel, second);
+
+    wait1Msec(100);
+
+    while(robot.ballLoaded) {
+        robot.indexerOverride = FORWARD;
+        wait1Msec(20);
+    }
+
 }
 
 
@@ -179,7 +171,7 @@ void wallSquare(int direction) {
 // Backfield Auton
 void autonBackfield() {
     // Turn on flywheel
-    targetTBH(robot.flywheel, 2000);
+    targetTBH(robot.flywheel, 2400);
 
     wait1Msec(500);
 
@@ -194,14 +186,14 @@ void autonBackfield() {
     wait1Msec(1000);
 
     // Drive to park
-    driveMax(700);
+    driveMax(300);
     wait1Msec(400);
 
 
     if(match.alliance == ALLIANCE_RED) {
-        turn(-90);
+        turn(-100);
     } else {
-        turn(90);
+        turn(100);
     }
 
     robot.leftDrive = -80;
@@ -212,7 +204,7 @@ void autonBackfield() {
 
     wait1Msec(1000);
 
-    driveMax(1400)
+    driveMax(750)
 }
 
 void autonFrontfieldOld() {
@@ -221,9 +213,9 @@ void autonFrontfieldOld() {
     robot.intake = REVERSE;
 
     // Score low flag
-    drive(400);
+    drive(900);
     wait1Msec(400);
-    drive(-100);
+    drive(-350);
 
     // Shoot at middle flag
     fire();
@@ -249,35 +241,39 @@ void autonFrontfield() {
     robot.intake = REVERSE;
 
     // Grab low ball in front of you, scoring cap
-    drive(600);
-    drive(-700);
+    drive(550);
+    drive(-650);
 
     wait1Msec(200);
-
+    drive(100)
     // Turn to face tree of flags
     if(match.alliance == ALLIANCE_RED) {
-        turn(90);
+        turn(100);
     } else {
-        turn(-90);
+        turn(-100);
     }
 
     // First first shot
     fire();
 
-    wait1Msec(300);
+    // wait1Msec(300);
+    // // set rpm for secound shot
+    // // targetTBH(robot.flywheel, 2500);
 
-    if(match.alliance == ALLIANCE_RED) {
-        turn(30);
-    } else {
-        turn(-30);
-    }
 
-    // // Score ground flag
-    drive(800);
-    wait1Msec(300);
+    // // if(match.alliance == ALLIANCE_RED) {
+    // //     turn(10);
+    // // } else {
+    // //     turn(-10);
+    // // }
 
-    // // Second shot
-    // drive(-350)
+    // // // Score ground flag
+    // drive(600);
+    // wait1Msec(300);
+
+    // // // Second shot
+    // drive(-450)
+    // drive(100)
     // fire();
 
 
@@ -286,12 +282,13 @@ void autonFrontfield() {
 // Fire Preload and Center Park
 void autonProgSkills() {
     // Turn on flywheel
-    targetTBH(robot.flywheel, 2000);
-
-    wait1Msec(2000);
+    targetTBH(robot.flywheel, 2700);
+    wait1Msec(3000);
 
     // Fire preload
     fire();
+
+    wait1Msec(3000);
 
 
     // Turn off flywheel to save power
@@ -299,8 +296,8 @@ void autonProgSkills() {
     wait1Msec(1000);
 
     // Drive to park
-    driveMax(500);
-    wait1Msec(400);
+    driveMax(400);
+    wait1Msec(300);
 
     turn(-90);
 
@@ -328,4 +325,9 @@ void autonTestFlywheel() {
 
 void autonDoubleShot()  {
     doubleShot(2500, 2000)
+}
+
+void autonTestDrive() {
+    targetTBH(robot.flywheel, 2500)
+    drive(600);
 }

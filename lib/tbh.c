@@ -23,14 +23,16 @@ typedef struct {
     // Actual in RPM
     float process;
 
-    // Gain (single tuning parameter!)
-    float gain;
+    // Tuning Parameters (gain is integral)
+    float Ki;
+    float Kd;
 
     // Error (setpoint - error)
     float error;
 
     // Error last frame
     float lastError;
+    float integral;
 
     // Take Back Half
     float tbh;
@@ -56,8 +58,9 @@ typedef struct {
 
 } TBHController;
 
-void initTBH(TBHController & controller, float gain, float maxRPM, int encoder, float gearRatio) {
-    controller.gain = gain;
+void initTBH(TBHController & controller, float gain, float Kd, float maxRPM, int encoder, float gearRatio) {
+    controller.Ki = gain;
+    controller.Kd = Kd;
     controller.maxRPM = maxRPM;
     controller.lastError = 1;
     controller.encoder = encoder;
@@ -69,28 +72,47 @@ void stepTBH(TBHController & controller) {
     // TBH responds weirdly to setting to zero, just let slew rate take care of it
     if(controller.setpoint == 0) {
         controller.output = 0;
+        controller.integral = 0;
+        return;
     }
 
     // Calculate Error
     controller.error = controller.setpoint - controller.process;
 
-    // Ramp up output
-    controller.output += controller.gain * controller.error;
+    // Integral Component (the actual TBH)
+    controller.integral += controller.Ki * controller.error;
+
 
     // If the error has changed signs since last time, take back half
     if(sgn(controller.lastError) != sgn(controller.error)) {
-        controller.output = 0.5 * (controller.output + controller.tbh);
-        controller.tbh = controller.output;
+        controller.integral = 0.5 * (controller.integral + controller.tbh);
+        controller.tbh = controller.integral;
+    }
+
+    // Derivative Component (for critcal dampening, disable when error is sufficiently small)
+    if (controller.error > 50) {
+        controller.output = controller.integral + controller.Kd * controller.lastError;
+    } else {
+        controller.output = controller.integral;
     }
 
     controller.lastError = controller.error;
 
+
+    if (controller.setpoint > 0 || controller.process > 0) { 
+        writeDebugStreamLine("%d, %d, %d", nSysTime, controller.setpoint, controller.process);
+    }
 }
 
 // Targets Controller
 void targetTBH(TBHController & controller, float setpoint) {
-    // Setting values to optimize spinup time
 
+    // If no change to setpoint, return
+    if(controller.setpoint == setpoint) {
+        return;
+    }
+
+    // Setting values to optimize spinup time
     if(controller.setpoint < setpoint) {
         controller.lastError = 1;
     } else if(controller.setpoint > setpoint) {

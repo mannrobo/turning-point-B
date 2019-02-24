@@ -45,6 +45,7 @@ typedef struct {
 
 	// Double Shot (0 = inactive, 1 = before first shot, 2 = before second shot)
 	int doubleShotMode;
+	int resetCounter;
 
 	// indexer override
 	motorMode indexerOverride;
@@ -86,22 +87,31 @@ void flywheelStep() {
 		targetTBH(robot.flywheel, 2500);
 		robot.firing = true;
 		robot.doubleShotMode++;
+		robot.intake = REVERSE;
 	}
 
 	// Double Shot: Fired First Shot
 	if (robot.doubleShotMode == 1 && !robot.ballLoaded) {
-		targetTBH(robot.flywheel, 0);
+		targetTBH(robot.flywheel, 2200);
 		robot.doubleShotMode++;
+		robot.intake = REVERSE;
 	}
 
-	// Double Shot: Fire Second Ball
-	if(robot.doubleShotMode == 2 && robot.flywheel.process < 2300) {
+	// Double Shot: Slew Down Velocity
+	// if(robot.doubleShotMode == 2 && robot.flywheel.process < 2900) {
+	// 	targetTBH(robot.flywheel, 2400)
+	// }
+	
+
+	// Double Shot: Fire 2nd Ball
+	if(robot.doubleShotMode == 2) {
 		robot.indexerOverride = FORWARD;
 		robot.doubleShotMode++;
+		robot.resetCounter = nSysTime;
 	}
 	
-	// Double Shot: Reset
-	if(robot.doubleShotMode == 3 && !robot.ballLoaded && robot.flywheel.process > 2300) {
+	// Double Shot: Reset (via a timeout)
+	if(robot.doubleShotMode == 3 && !robot.ballLoaded && nSysTime - robot.resetCounter > 2000) {
 		targetTBH(robot.flywheel, 2500);
 		robot.indexerOverride = STOP;
 		robot.intake = STOP;
@@ -161,17 +171,22 @@ void driveStep() {
 
 void takerStep() {
 
-	if(vexRT[Btn6U] && vexRT[Btn6D]) {
-		robot.intake = STOP;
-	} else if(vexRT[Btn6U])  {
+	if(vexRT[Btn6U])  {
 		robot.intake = REVERSE;
 	} else if (vexRT[Btn6D]) {
 		robot.intake = FORWARD;
+	} else {
+		robot.intake = STOP;
 	}
 
 	// Shoot out ball if required
 	if(robot.indexerOverride != STOP) {
 		robot.indexer = robot.indexerOverride;
+	}
+
+	// If fire mode, then move indexer to catch balls
+	if(robot.firing) {
+		robot.intake = REVERSE;
 	}
 
 
@@ -201,13 +216,13 @@ void takerStep() {
 }
 
 task hardwareAbstractionLayer() {
-	initTBH(robot.flywheel, 0.0015, 3500, flywheel, 5.0);
+	initTBH(robot.flywheel, 0.001, 0.1, 3500, flywheel, 5.0);
 	targetTBH(robot.flywheel, 0);
 
 	while(true) {
 		driveStep();
-		flywheelStep();
 		takerStep();
+		flywheelStep();
 		motorControlStep();
 		wait1Msec(20);
 	}
