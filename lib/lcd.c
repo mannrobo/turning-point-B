@@ -47,7 +47,7 @@ task lcdDebug() {
                 break;
             case 1:
                 sprintf(lineOne, "%d => %d", robot.flywheel.error, robot.flywheel.output);
-                sprintf(lineTwo, "%d -- %d", robot.flywheel.tbh, robot.doubleShotMode);
+                sprintf(lineTwo, "%d,%d,%d", robot.flywheel.tbh, robot.doubleShotMode, robot.intake);
                 break;
             case 2:
                 sprintf(lineOne, "IDXR:%s FRNG:%s", robot.ballLoaded ? "B" : "NB", robot.firing ? "Y" : "N");
