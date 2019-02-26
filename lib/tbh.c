@@ -58,9 +58,8 @@ typedef struct {
 
 } TBHController;
 
-void initTBH(TBHController & controller, float gain, float Kd, float maxRPM, int encoder, float gearRatio) {
+void initTBH(TBHController & controller, float gain, float maxRPM, int encoder, float gearRatio) {
     controller.Ki = gain;
-    controller.Kd = Kd;
     controller.maxRPM = maxRPM;
     controller.lastError = 1;
     controller.encoder = encoder;
@@ -83,15 +82,16 @@ void stepTBH(TBHController & controller) {
     controller.integral += controller.Ki * controller.error;
 
 
+
     // If the error has changed signs since last time, take back half
     if(sgn(controller.lastError) != sgn(controller.error)) {
         controller.integral = 0.5 * (controller.integral + controller.tbh);
         controller.tbh = controller.integral;
     }
 
-    // Derivative Component (for critcal dampening, disable when error is sufficiently small)
-    if (controller.error > 50) {
-        controller.output = controller.integral + controller.Kd * controller.lastError;
+    // Bang Bang for large enough errors, resetting the integral
+    if (abs(controller.error) > 2000) {
+        controller.output = sgn(controller.error) * 127;
     } else {
         controller.output = controller.integral;
     }
