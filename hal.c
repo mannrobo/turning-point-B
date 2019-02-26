@@ -92,7 +92,7 @@ void flywheelStep() {
 
 	// Double Shot: Fired First Shot
 	if (robot.doubleShotMode == 1 && !robot.ballLoaded) {
-		targetTBH(robot.flywheel, 2200);
+		targetTBH(robot.flywheel, 2000);
 		robot.doubleShotMode++;
 		robot.intake = REVERSE;
 	}
@@ -216,7 +216,7 @@ void takerStep() {
 }
 
 task hardwareAbstractionLayer() {
-	initTBH(robot.flywheel, 0.001, 0.1, 3500, flywheel, 5.0);
+	initTBH(robot.flywheel, 0.0015, 3500, flywheel, 5.0);
 	targetTBH(robot.flywheel, 0);
 
 	while(true) {
