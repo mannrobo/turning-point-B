@@ -91,17 +91,14 @@ void flywheelStep() {
 	}
 
 	// Double Shot: Fired First Shot
-	if (robot.doubleShotMode == 1 && !robot.ballLoaded) {
-		targetTBH(robot.flywheel, 2000);
+	if (robot.doubleShotMode == 1 && abs(robot.flywheel.error) > 300) {
+		
+		// Set to hold power for 2000 rpm
+		robot.flywheel.output = 39;
+
 		robot.doubleShotMode++;
 		robot.intake = REVERSE;
 	}
-
-	// Double Shot: Slew Down Velocity
-	// if(robot.doubleShotMode == 2 && robot.flywheel.process < 2900) {
-	// 	targetTBH(robot.flywheel, 2400)
-	// }
-	
 
 	// Double Shot: Fire 2nd Ball
 	if(robot.doubleShotMode == 2) {
@@ -112,7 +109,6 @@ void flywheelStep() {
 	
 	// Double Shot: Reset (via a timeout)
 	if(robot.doubleShotMode == 3 && !robot.ballLoaded && nSysTime - robot.resetCounter > 2000) {
-		targetTBH(robot.flywheel, 2500);
 		robot.indexerOverride = STOP;
 		robot.intake = STOP;
 		robot.doubleShotMode = 0;		
@@ -135,11 +131,12 @@ void flywheelStep() {
 
 	// Flywheel Itself
 	calculateProcessTBH(robot.flywheel);
-	stepTBH(robot.flywheel);
+
+	if (!(robot.doubleShotMode == 1 && !robot.ballLoaded)) {
+		stepTBH(robot.flywheel);
+	}	
 
 	motorTarget[FlywheelOut] = robot.flywheel.output;
-
-
 
 }
 
