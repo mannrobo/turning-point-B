@@ -71,10 +71,10 @@ task autonomous() {
 
   switch(match.auton) {
     case 0:
-      autonFrontfield();
+      autonFrontfieldOld();
       break;
     case 1:
-      autonBackfield();
+      autonBlake();
       break;
     case 2:
       autonProgSkills();
