@@ -90,8 +90,9 @@ void stepTBH(TBHController & controller) {
     }
 
     // Bang Bang for large enough errors, resetting the integral
-    if (abs(controller.error) > 2000) {
+    if (abs(controller.error) > 750) {
         controller.output = sgn(controller.error) * 127;
+        controller.integral = 100
     } else {
         controller.output = controller.integral;
     }
