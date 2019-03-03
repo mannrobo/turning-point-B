@@ -133,6 +133,10 @@ void calculateProcessTBH(TBHController & controller) {
     controller.deltaEncoder = SensorValue[controller.encoder] - controller.lastEncoder;
     controller.lastEncoder = SensorValue[controller.encoder];
 
-    controller.process = ((float)controller.deltaEncoder / (float)controller.deltaTime) * 1000.0 *  controller.gearRatio / 360.0 * 60.0;
+    float current = (((float)controller.deltaEncoder / (float)controller.deltaTime) * 1000.0 *  controller.gearRatio / 360.0 * 60.0);
+
+    // Expotential Smoothing (take into account previous measurements)
+    controller.process = (3 * controller.process + current) / 4
+
     
 }
