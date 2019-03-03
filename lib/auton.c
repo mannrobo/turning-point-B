@@ -89,6 +89,21 @@ void driveMax(int distance) {
 
 }
 
+void driveCoast(int distance) {
+    SensorValue[leftDrive] = 0;
+    SensorValue[rightDrive] = 0;
+
+    while(abs(SensorValue[leftDrive]) < abs(distance)) {
+        robot.leftDrive = sgn(distance) * 90;
+        robot.rightDrive = sgn(distance) * 90;
+
+        wait1Msec(20);
+    }
+
+    robot.leftDrive = 0;
+    robot.rightDrive = 0;
+}
+
 
 /**
  * Find the "absolute" gyro position (Always 0 - 360) in DEGREES!
@@ -313,6 +328,30 @@ void autonProgSkills() {
 
 }
 
+void autonBlake() {
+    // Target flywheel early so we don't have to waste time waiting for it to spin up
+    targetTBH(robot.flywheel, 3000);
+
+
+    // Drive up to score first cap
+    drive(500);
+    wait1Msec(500);
+
+    // Turn to face first cap    
+    turn(-60);
+    wait1Msec(500);
+
+    robot.intake = FORWARD;
+
+    driveCoast(750)
+    wait1Msec(800)
+    drive(-750)
+
+
+
+    // Om nom nom balls (intake mode)
+    robot.intake = REVERSE;
+}
 
 
 void autonTestFlywheel() {
