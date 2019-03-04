@@ -34,6 +34,8 @@ typedef struct {
 	motorMode intake;
 	motorMode indexer;
 
+	motorMode descore;
+
 	// Cap Flipper power
 	int capFlipper;
 
@@ -92,7 +94,7 @@ void flywheelStep() {
 
 	// Double Shot: Fired First Shot
 	if (robot.doubleShotMode == 1 && abs(robot.flywheel.error) > 300) {
-		
+
 		// Set to hold power for 2000 rpm
 		robot.flywheel.output = 39;
 
@@ -106,12 +108,12 @@ void flywheelStep() {
 		robot.doubleShotMode++;
 		robot.resetCounter = nSysTime;
 	}
-	
+
 	// Double Shot: Reset (via a timeout)
 	if(robot.doubleShotMode == 3 && !robot.ballLoaded && nSysTime - robot.resetCounter > 2000) {
 		robot.indexerOverride = STOP;
 		robot.intake = STOP;
-		robot.doubleShotMode = 0;		
+		robot.doubleShotMode = 0;
 	}
 
 
@@ -134,7 +136,7 @@ void flywheelStep() {
 
 	if (!(robot.doubleShotMode == 1 && !robot.ballLoaded)) {
 		stepTBH(robot.flywheel);
-	}	
+	}
 
 	motorTarget[FlywheelOut] = robot.flywheel.output;
 
@@ -157,11 +159,9 @@ void driveStep() {
 
     // Note: Back A motors are INTENTIONALLY reversed
 	motorTarget[DriveFL] = robot.leftDrive;
-	motorTarget[DriveBLA] = robot.rightDrive;
 	motorTarget[DriveBLB] = robot.leftDrive;
 
 	motorTarget[DriveFR] = -robot.rightDrive;
-	motorTarget[DriveBRA] = -robot.leftDrive;
 	motorTarget[DriveBRB] = -robot.rightDrive;
 }
 
@@ -184,6 +184,18 @@ void takerStep() {
 	// If fire mode, then move indexer to catch balls
 	if(robot.firing) {
 		robot.intake = REVERSE;
+	}
+
+	// Descore
+	if (vexRT[Btn8L]) {
+		motorTarget[DescoreL] = -127;
+		motorTarget[DescoreR] = -127;
+	} else if (vexRT[Btn8R]) {
+		motorTarget[DescoreL] = 127;
+		motorTarget[DescoreR] = 127;
+	} else {
+		motorTarget[DescoreL] = 0;
+		motorTarget[DescoreR] = 0;
 	}
 
 
