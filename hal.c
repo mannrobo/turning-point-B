@@ -30,6 +30,7 @@ typedef struct {
 
 	// Flywheel
 	TBHController flywheel;
+	bool disableFlywheelControl;
 
 	motorMode intake;
 	motorMode indexer;
@@ -60,9 +61,11 @@ HardwareAbstraction robot;
 void flywheelStep() {
 	// Targeting
 	if(vexRT[Btn7U]) {
-		targetTBH(robot.flywheel, 2500);
+		targetTBH(robot.flywheel, 2600);
 	} else if(vexRT[Btn7R]) {
 		targetTBH(robot.flywheel, 2400);
+	} else if  (vexRT[Btn7L]) {
+		targetTBH(robot.flywheel, 2500)
 	} else if(vexRT[Btn7D]) {
 		targetTBH(robot.flywheel, 0);
 	}
@@ -84,36 +87,46 @@ void flywheelStep() {
 	// Detect Balls for Firing Control
 	robot.ballLoaded = SensorValue[ballDetector] <= 10;
 
+
 	// Double Shot: Activate
 	if (vexRT[Btn5D] && robot.doubleShotMode == 0 && robot.ballLoaded) {
-		targetTBH(robot.flywheel, 2500);
+		writeDebugStreamLine("Activate")
 		robot.firing = true;
-		robot.doubleShotMode++;
+		robot.doubleShotMode = 1;
 		robot.intake = REVERSE;
 	}
 
 	// Double Shot: Fired First Shot
 	if (robot.doubleShotMode == 1 && abs(robot.flywheel.error) > 300) {
+		robot.disableFlywheelControl = true;
+		// Set to hold power for second shot
+		if (robot.flywheel.setpoint == 2600) {
+			robot.flywheel.output = 0;
+		} else {
+			robot.flywheel.output = 39;
+		}
 
-		// Set to hold power for 2000 rpm
-		robot.flywheel.output = 39;
-
-		robot.doubleShotMode++;
+		robot.doubleShotMode = 2;
 		robot.intake = REVERSE;
+		robot.firing = false;
 	}
+
 
 	// Double Shot: Fire 2nd Ball
 	if(robot.doubleShotMode == 2) {
+		writeDebugStreamLine("Second Shot")
 		robot.indexerOverride = FORWARD;
-		robot.doubleShotMode++;
+		robot.doubleShotMode = 3
 		robot.resetCounter = nSysTime;
 	}
 
 	// Double Shot: Reset (via a timeout)
 	if(robot.doubleShotMode == 3 && !robot.ballLoaded && nSysTime - robot.resetCounter > 2000) {
+		writeDebugStreamLine("Reset")
 		robot.indexerOverride = STOP;
 		robot.intake = STOP;
 		robot.doubleShotMode = 0;
+		robot.disableFlywheelControl = false;
 	}
 
 
@@ -134,11 +147,13 @@ void flywheelStep() {
 	// Flywheel Itself
 	calculateProcessTBH(robot.flywheel);
 
-	if (!(robot.doubleShotMode == 1 && !robot.ballLoaded)) {
+	if (!robot.disableFlywheelControl) {
 		stepTBH(robot.flywheel);
 	}
 
+
 	motorTarget[FlywheelOut] = robot.flywheel.output;
+	// writeDebugStreamLine("%d", motorTarget[FlywheelOut])
 
 }
 
@@ -172,7 +187,7 @@ void takerStep() {
 		robot.intake = REVERSE;
 	} else if (vexRT[Btn6D]) {
 		robot.intake = FORWARD;
-	} else {
+	} else if (!bIfiAutonomousMode) {
 		robot.intake = STOP;
 	}
 
@@ -188,11 +203,11 @@ void takerStep() {
 
 	// Descore
 	if (vexRT[Btn8L]) {
-		motorTarget[DescoreL] = -127;
-		motorTarget[DescoreR] = -127;
-	} else if (vexRT[Btn8R]) {
 		motorTarget[DescoreL] = 127;
 		motorTarget[DescoreR] = 127;
+	} else if (vexRT[Btn8R]) {
+		motorTarget[DescoreL] = -127;
+		motorTarget[DescoreR] = -127;
 	} else {
 		motorTarget[DescoreL] = 0;
 		motorTarget[DescoreR] = 0;
