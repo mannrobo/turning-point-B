@@ -55,8 +55,8 @@ void drive(int distance) {
         robot.driveController.value = SensorValue[leftDrive];
         stepPID(robot.driveController);
 
-        robot.leftDrive = robot.driveController.output;
-        robot.rightDrive = robot.driveController.output;
+        robot.leftDrive = robot.driveController.output * 0.7;
+        robot.rightDrive = robot.driveController.output * 0.7;
     } while(abs(robot.driveController.output) > 20);
 
     // Break
@@ -131,13 +131,17 @@ void turn(int degrees) {
         robot.turnController.value = SensorValue[gyro] / 10.0;
         stepPID(robot.turnController);
 
-        robot.leftDrive = -robot.turnController.output;
-        robot.rightDrive = robot.turnController.output;
+        // Turn at constant rate
+        robot.leftDrive = -50 * sgn(degrees);  
+        robot.rightDrive = 50 * sgn(degrees);
     } while(abs(robot.turnController.output) > 20);
 
-    robot.leftDrive  = 50 * sgn(degrees);
+    // Break
+    robot.leftDrive = 50 * sgn(degrees);
     robot.rightDrive = -50 * sgn(degrees);
+
     wait1Msec(100);
+
     robot.leftDrive = 0;
     robot.rightDrive = 0;
 }
@@ -147,6 +151,7 @@ void fire() {
     while(robot.firing)  {
         wait1Msec(20);
     }
+    robot.firing = false;
 }
 
 
@@ -159,7 +164,7 @@ void doubleShot(int first, int second) {
     
     targetTBH(robot.flywheel, second);
 
-    wait1Msec(100);
+    wait1Msec(300);
 
     while(robot.ballLoaded) {
         robot.indexerOverride = FORWARD;
@@ -223,29 +228,44 @@ void autonBackfield() {
 }
 
 void autonFrontfieldOld() {
-    targetTBH(robot.flywheel, 2500);
+    targetTBH(robot.flywheel, 2900);
 
     robot.intake = REVERSE;
 
-    // Score low flag
-    drive(900);
+    // Grab ball
+    drive(1200);
     wait1Msec(400);
-    drive(-350);
+    drive(-1200);
 
-    // Shoot at middle flag
-    fire();
+    // Drive forward a bit
+    drive(100);
+
+    wait1Msec(1000);
+
+    // Turn to face tree of flags
+    if(match.alliance == ALLIANCE_RED) {
+        turn(90);
+    } else {
+        turn(-90);
+    };
 
     wait1Msec(500);
-    drive(-100);
 
-    // Score closest cap
+    doubleShot(2900, 0);
+
+    wait1Msec(1000);
+
+    // Turn to score caps
     if(match.alliance == ALLIANCE_RED) {
-        turn(-90);
+        turn(-45);
     } else {
-        turn(90);
-    }
+        turn(45);
+    };
+
+    robot.intake = FORWARD;
 
     drive(400);
+
 }
 
 void autonFrontfield() {
@@ -330,27 +350,25 @@ void autonProgSkills() {
 
 void autonBlake() {
     // Target flywheel early so we don't have to waste time waiting for it to spin up
-    targetTBH(robot.flywheel, 3000);
+    targetTBH(robot.flywheel, 2800);
 
-
-    // Drive up to score first cap
-    drive(500);
-    wait1Msec(500);
-
-    // Turn to face first cap    
-    turn(-60);
-    wait1Msec(500);
-
-    robot.intake = FORWARD;
-
-    driveCoast(750)
-    wait1Msec(800)
-    drive(-750)
-
-
+    robot.intake = REVERSE;
 
     // Om nom nom balls (intake mode)
-    robot.intake = REVERSE;
+    drive(900);
+    turn(71);
+
+
+    wait1Msec(1000)
+
+
+    fire();
+
+    targetTBH(robot.flywheel, 2600);
+    wait1Msec(4000)
+    fire();
+    
+
 }
 
 
